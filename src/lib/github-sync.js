@@ -80,22 +80,34 @@ export function detectRepoFromToken(token) {
 async function getFileSha(token, owner, repo, path, branch = 'main') {
     // كسر كاش المتصفح لضمان الحصول على SHA الأحدث دائماً
     const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}?ref=${branch}&_t=${Date.now()}`;
-    const res = await fetch(url, {
-      cache: 'no-store',
-      headers: {
-        Authorization: `token ${token}`,
-        Accept: 'application/vnd.github.v3+json',
-        'Cache-Control': 'no-cache, no-store',
-      },
-    });
-    if (res.status === 404) return null;
-    if (!res.ok) throw new Error(`فشل الحصول على معلومات الملف: ${res.status}`);
-    const data = await res.json();
-    return data.sha;
+    try {
+      const res = await fetch(url, {
+        cache: 'no-store',
+        headers: {
+          'Authorization': `token ${token}`,
+          'Accept': 'application/vnd.github.v3+json',
+          'Cache-Control': 'no-cache, no-store',
+          'User-Agent': 'Mustapha-Immobilier-CMS',
+        },
+      });
+      if (res.status === 404) return null;
+      if (!res.ok) throw new Error(`فشل الحصول على معلومات الملف: ${res.status}`);
+      const data = await res.json();
+      return data.sha;
+    } catch (err) {
+      if (err instanceof TypeError && err.message.includes('Failed to fetch')) {
+        throw new Error('فشل الاتصال بـ GitHub. تحقق من اتصالك بالإنترنت.');
+      }
+      throw err;
     }
+}
 
 // ---- رفع/تحديث ملف في المستودع ----
 async function uploadFileToRepo(token, owner, repo, path, content, message, branch = 'main') {
+  if (!token || !token.trim()) {
+    throw new Error('التوكن غير صحيح. يرجى التحقق من إعدادات المزامنة.');
+  }
+
   const sha = await getFileSha(token, owner, repo, path, branch);
   const body = {
     message,
@@ -105,21 +117,35 @@ async function uploadFileToRepo(token, owner, repo, path, content, message, bran
   if (sha) body.sha = sha;
 
   const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
-  const res = await fetch(url, {
-    method: 'PUT',
-    headers: {
-      Authorization: `token ${token}`,
-      Accept: 'application/vnd.github.v3+json',
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(body),
-  });
+  
+  try {
+    const res = await fetch(url, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `token ${token}`,
+        'Accept': 'application/vnd.github.v3+json',
+        'Content-Type': 'application/json',
+        'User-Agent': 'Mustapha-Immobilier-CMS',
+      },
+      body: JSON.stringify(body),
+    });
 
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err.message || `فشل الرفع: ${res.status}`);
+    if (!res.ok) {
+      let errMsg = `فشل الرفع: ${res.status}`;
+      try {
+        const err = await res.json();
+        if (err.message) errMsg = err.message;
+        if (err.errors && err.errors[0]) errMsg = err.errors[0].message;
+      } catch { /* ignore */ }
+      throw new Error(errMsg);
+    }
+    return res.json();
+  } catch (err) {
+    if (err instanceof TypeError && err.message.includes('Failed to fetch')) {
+      throw new Error('فشل الاتصال بـ GitHub. تحقق من اتصالك بالإنترنت أو أن التوكن صحيح.');
+    }
+    throw err;
   }
-  return res.json();
 }
 
 // ---- تحويل ملف إلى base64 (للرفع) ----
@@ -148,26 +174,30 @@ function generateImageName(file) {
 // ============================================================
 export async function uploadImage(file, onProgress) {
   const { token, owner, repo } = getSyncSettings();
-  if (!token) {
-    throw new Error('لم يتم إعداد GitHub.');
+  if (!token || !token.trim()) {
+    throw new Error('لم يتم إعداد GitHub. يرجى إدخال توكن صحيح في الإعدادات.');
   }
 
   if (onProgress) onProgress('جاري تحضير الصورة...');
 
-  const base64 = await fileToBase64(file);
-  const fileName = generateImageName(file);
-  const filePath = `${UPLOADS_DIR}/${fileName}`;
+  try {
+    const base64 = await fileToBase64(file);
+    const fileName = generateImageName(file);
+    const filePath = `${UPLOADS_DIR}/${fileName}`;
 
-  if (onProgress) onProgress('جاري رفع الصورة إلى المستودع...');
+    if (onProgress) onProgress('جاري رفع الصورة إلى المستودع...');
 
-  await uploadFileToRepo(
-    token, owner, repo, filePath, base64,
-    `chore: رفع صورة ${fileName}`
-  );
+    await uploadFileToRepo(
+      token, owner, repo, filePath, base64,
+      `chore: رفع صورة ${fileName}`
+    );
 
-  // نرجع raw GitHub URL ليعمل الصورة فوراً على الموقع المنشور بدون بناء
-  const rawUrl = `https://raw.githubusercontent.com/${owner}/${repo}/main/${filePath}`;
-  return rawUrl;
+    // نرجع raw GitHub URL ليعمل الصورة فوراً على الموقع المنشور بدون بناء
+    const rawUrl = `https://raw.githubusercontent.com/${owner}/${repo}/main/${filePath}`;
+    return rawUrl;
+  } catch (err) {
+    throw err;
+  }
 }
 
 // ============================================================
@@ -188,26 +218,30 @@ export async function uploadImages(files, onProgress) {
 // ============================================================
 export async function syncDataToRepo(data, onProgress) {
   const { token, owner, repo } = getSyncSettings();
-  if (!token) {
-    throw new Error('لم يتم إعداد GitHub.');
+  if (!token || !token.trim()) {
+    throw new Error('لم يتم إعداد GitHub. يرجى إدخال توكن صحيح في الإعدادات.');
   }
 
   if (onProgress) onProgress('جاري تحديث ملف البيانات...');
 
-  const fullData = {
-    ...data,
-    updatedAt: new Date().toISOString(),
-  };
+  try {
+    const fullData = {
+      ...data,
+      updatedAt: new Date().toISOString(),
+    };
 
-  const jsonStr = JSON.stringify(fullData, null, 2);
-  const base64 = btoa(unescape(encodeURIComponent(jsonStr)));
+    const jsonStr = JSON.stringify(fullData, null, 2);
+    const base64 = btoa(unescape(encodeURIComponent(jsonStr)));
 
-  const result = await uploadFileToRepo(
-    token, owner, repo, DATA_FILE_PATH, base64,
-    `data: تحديث البيانات المركزية (${new Date().toLocaleString('ar-MA')})`
-  );
+    const result = await uploadFileToRepo(
+      token, owner, repo, DATA_FILE_PATH, base64,
+      `data: تحديث البيانات المركزية (${new Date().toLocaleString('ar-MA')})`
+    );
 
-  return result;
+    return result;
+  } catch (err) {
+    throw err;
+  }
 }
 
 // ============================================================

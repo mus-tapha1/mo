@@ -108,9 +108,9 @@ function Input({ label, value, onChange, type = 'text', placeholder = '', textar
     <div>
       <label className="block text-creme/60 text-xs mb-1.5">{label}</label>
       {textarea ? (
-        <textarea value={value} onChange={(e) => onChange(e.target.value)} className={baseClass + ' min-h-[80px] resize-y'} placeholder={placeholder} />
+        <textarea value={value || ''} onChange={(e) => onChange(e.target.value)} className={baseClass + ' min-h-[80px] resize-y'} placeholder={placeholder} />
       ) : (
-        <input type={type} value={value} onChange={(e) => onChange(e.target.value)} className={baseClass} placeholder={placeholder} />
+        <input type={type} value={value || ''} onChange={(e) => onChange(e.target.value)} className={baseClass} placeholder={placeholder} />
       )}
     </div>
   );
@@ -527,15 +527,15 @@ function ConfigManager({ showToast, onSync }) {
 
   useEffect(() => {
     setCfg(getConfig());
-    const currentToken = getSyncSettings().token;
-    if (currentToken) setGithubToken(currentToken);
+    const settings = getSyncSettings();
+    if (settings && settings.token) setGithubToken(settings.token);
   }, []);
 
   if (!cfg) return <p className="text-creme/40">جارٍ التحميل...</p>;
 
   const handleSaveConfig = async () => {
     saveConfig(cfg);
-    saveSyncSettings(githubToken); // تصحيح: تمرير التوكن مباشرة
+    saveSyncSettings(githubToken);
     await saveTokenToData(githubToken);
     showToast('تم حفظ الإعدادات وتحديث الموقع');
     onSync();

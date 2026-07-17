@@ -63,10 +63,8 @@
       "city": "القنيطرة",
       "area": "موقع استراتيجي",
       "surface": 75,
-      "image": "https://raw.githubusercontent.com/mus-tapha1/mo/main/public/uploads/img-mrp9zzl7-du8d.jpg",
-      "gallery": [
-        "https://images.unsplash.com/photo-1600596357905-23c75a4a8d92?w=1200&q=80"
-      ],
+      "image": "https://raw.githubusercontent.com/mus-tapha1/mo/main/public/uploads/img-mrpa0lkf-138u.jpg",
+      "gallery": [],
       "basics": [
         {
           "label": "نوع العقار",
@@ -579,7 +577,7 @@
     "city": "القنيطرة",
     "cityFr": "Kénitra",
     "contact": {
-      "phone": "+212 6 00 00 00 00",
+      "phone": "212778878421",
       "phoneHref": "+212600000000",
       "email": "contact@mustapha-immobilier.ma",
       "whatsapp": "+212600000000"
@@ -596,5 +594,5 @@
     "lang": "ar",
     "dir": "rtl"
   },
-  "updatedAt": "2026-07-17T18:33:12.191Z"
+  "updatedAt": "2026-07-17T18:34:45.688Z"
 }

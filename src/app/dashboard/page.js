@@ -34,6 +34,16 @@ function newItem(type) {
   return {};
 }
 
+// تحويل ملف إلى base64
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload  = () => resolve(r.result.split(',')[1]);
+    r.onerror = reject;
+    r.readAsDataURL(file);
+  });
+}
+
 // ضغط الصورة قبل الرفع
 function compressImage(file, maxWidth = 1400, quality = 0.82) {
   return new Promise((resolve) => {
@@ -113,95 +123,133 @@ export default function DashboardPage() {
     localStorage.setItem('mus_github_token', val);
   }
 
-  // ── رفع صورة ────────────────────────────────
-  async function uploadImageFile(file, field = 'image') {
-    if (!token) { showStatus('error', 'أدخل GitHub Token في الإعدادات أولاً'); return; }
-    setSyncStatus('uploading');
-
-    const compressed = await compressImage(file);
-    const ext  = 'jpg';
-    const rand = Math.random().toString(36).slice(2,6);
-    const name = `img-${Date.now().toString(36)}-${rand}.${ext}`;
-    const path = `public/uploads/${name}`;
-
-    const b64 = await new Promise((res, rej) => {
-      const r = new FileReader();
-      r.onload  = () => res(r.result.split(',')[1]);
-      r.onerror = rej;
-      r.readAsDataURL(compressed);
-    });
-
-    setUploadPct('جارٍ الرفع...');
+  // ── رفع ملف صورة إلى GitHub ─────────────────
+  async function githubUploadFile(path, b64, name) {
+    const tok = localStorage.getItem('mus_github_token') || token;
+    if (!tok) throw new Error('يرجى إدخال GitHub Token في الإعدادات أولاً');
     const resp = await fetch(`${API_BASE}/contents/${path}`, {
       method: 'PUT',
-      headers: { Authorization:`token ${token}`, 'Content-Type':'application/json' },
-      body: JSON.stringify({ message:`Upload: ${name}`, content: b64, branch:'main' }),
+      headers: { Authorization: `token ${tok}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: `Upload: ${name}`, content: b64, branch: 'main' }),
     });
+    if (!resp.ok) {
+      let reason = `HTTP ${resp.status}`;
+      try { const j = await resp.json(); reason = j.message || reason; } catch {}
+      throw new Error(reason);
+    }
+    return resp;
+  }
 
-    setUploadPct('');
-    if (!resp.ok) { showStatus('error','فشل رفع الصورة — تحقق من التوكن'); return; }
-
-    const url = `${RAW_BASE}/${path}`;
-    setModal(m => ({ ...m, item: { ...m.item, [field]: url } }));
-    showStatus('ok', 'تم رفع الصورة ✓');
+  // ── رفع صورة واحدة ──────────────────────────
+  async function uploadImageFile(file, field = 'image') {
+    const tok = localStorage.getItem('mus_github_token') || token;
+    if (!tok) { showStatus('error', 'أدخل GitHub Token في الإعدادات أولاً'); return; }
+    setSyncStatus('uploading'); setUploadPct('جارٍ ضغط الصورة...');
+    try {
+      const compressed = await compressImage(file);
+      const rand = Math.random().toString(36).slice(2, 7);
+      const name = `img-${Date.now().toString(36)}-${rand}.jpg`;
+      const path = `public/uploads/${name}`;
+      const b64  = await fileToBase64(compressed);
+      setUploadPct('جارٍ الرفع إلى GitHub...');
+      await githubUploadFile(path, b64, name);
+      const url = `${RAW_BASE}/${path}`;
+      setModal(m => ({ ...m, item: { ...m.item, [field]: url } }));
+      showStatus('ok', '✓ تم رفع الصورة — اضغط "حفظ ونشر" لإرسالها للموقع');
+    } catch (err) {
+      showStatus('error', `فشل الرفع: ${err.message}`);
+    } finally {
+      setUploadPct('');
+    }
   }
 
   // ── رفع صور متعددة ──────────────────────────
   async function uploadMultiple(files) {
-    if (!token) { showStatus('error', 'أدخل GitHub Token في الإعدادات أولاً'); return; }
-    const urls = [];
+    const tok = localStorage.getItem('mus_github_token') || token;
+    if (!tok) { showStatus('error', 'أدخل GitHub Token في الإعدادات أولاً'); return; }
+    const urls = []; const errs = [];
     for (let i = 0; i < files.length; i++) {
       setSyncStatus('uploading');
-      setUploadPct(`رفع ${i+1}/${files.length}...`);
-      const compressed = await compressImage(files[i]);
-      const name = `img-${Date.now().toString(36)}-${Math.random().toString(36).slice(2,5)}.jpg`;
-      const path = `public/uploads/${name}`;
-      const b64  = await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result.split(',')[1]);r.onerror=rej;r.readAsDataURL(compressed);});
-      const resp = await fetch(`${API_BASE}/contents/${path}`,{method:'PUT',headers:{Authorization:`token ${token}`,'Content-Type':'application/json'},body:JSON.stringify({message:`Upload: ${name}`,content:b64,branch:'main'})});
-      if (resp.ok) urls.push(`${RAW_BASE}/${path}`);
+      setUploadPct(`ضغط وإرسال ${i + 1} من ${files.length}...`);
+      try {
+        const compressed = await compressImage(files[i]);
+        const name = `img-${Date.now().toString(36)}-${Math.random().toString(36).slice(2,6)}.jpg`;
+        const path = `public/uploads/${name}`;
+        const b64  = await fileToBase64(compressed);
+        await githubUploadFile(path, b64, name);
+        urls.push(`${RAW_BASE}/${path}`);
+      } catch (err) { errs.push(err.message); }
     }
     setUploadPct('');
     if (urls.length) {
-      setModal(m => ({ ...m, item: { ...m.item, gallery:[...(m.item.gallery||[]), ...urls] } }));
-      showStatus('ok', `تم رفع ${urls.length} صورة ✓`);
+      setModal(m => ({ ...m, item: { ...m.item, gallery: [...(m.item.gallery || []), ...urls] } }));
+      showStatus('ok', `✓ تم رفع ${urls.length} صورة${errs.length ? ` (فشل ${errs.length})` : ''}`);
     } else {
-      showStatus('error', 'فشل رفع الصور');
+      showStatus('error', `فشل الرفع: ${errs[0] || 'خطأ غير معروف'}`);
     }
   }
 
-  // ── مزامنة وحفظ ─────────────────────────────
-  async function handleSync() {
-    if (!token) { showStatus('error','أدخل GitHub Token في الإعدادات'); return; }
-    setSyncStatus('saving'); setSyncMsg('جارٍ الحفظ والنشر...');
+  // ── نشر data.json إلى GitHub ─────────────────
+  async function syncData(freshData) {
+    const tok = localStorage.getItem('mus_github_token') || token;
+    if (!tok) { showStatus('error', 'أدخل GitHub Token في الإعدادات'); return false; }
+    setSyncStatus('saving'); setSyncMsg('جارٍ النشر على الموقع...');
     try {
-      const finalData = { ...data, updatedAt: new Date().toISOString() };
-      const shaRes = await fetch(`${API_BASE}/contents/${DATA_PATH}?ref=main`,{headers:{Authorization:`token ${token}`}});
-      const sha = shaRes.ok ? (await shaRes.json()).sha : null;
-      const pushRes = await fetch(`${API_BASE}/contents/${DATA_PATH}`,{
-        method:'PUT',
-        headers:{Authorization:`token ${token}`,'Content-Type':'application/json'},
-        body: JSON.stringify({ message:'CMS update', content: btoa(unescape(encodeURIComponent(JSON.stringify(finalData,null,2)))), sha, branch:'main' }),
+      const finalData = { ...freshData, updatedAt: new Date().toISOString() };
+      const shaRes = await fetch(`${API_BASE}/contents/${DATA_PATH}?ref=main`, {
+        headers: { Authorization: `token ${tok}` },
       });
-      if (pushRes.ok) { showStatus('ok','تم الحفظ والنشر بنجاح ✓'); loadData(); }
-      else showStatus('error','فشل النشر — تحقق من التوكن');
-    } catch(e) { showStatus('error','خطأ: '+e.message); }
+      let sha = null;
+      if (shaRes.ok) { try { sha = (await shaRes.json()).sha; } catch {} }
+      const pushRes = await fetch(`${API_BASE}/contents/${DATA_PATH}`, {
+        method: 'PUT',
+        headers: { Authorization: `token ${tok}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: 'CMS update',
+          content: btoa(unescape(encodeURIComponent(JSON.stringify(finalData, null, 2)))),
+          sha,
+          branch: 'main',
+        }),
+      });
+      if (pushRes.ok) {
+        showStatus('ok', '✓ تم الحفظ والنشر — سيظهر على الموقع خلال دقيقة');
+        return true;
+      }
+      let reason = `HTTP ${pushRes.status}`;
+      try { const j = await pushRes.json(); reason = j.message || reason; } catch {}
+      showStatus('error', `فشل النشر: ${reason}`);
+      return false;
+    } catch (e) {
+      showStatus('error', `خطأ: ${e.message}`);
+      return false;
+    }
+  }
+
+  async function handleSync() {
+    await syncData(data);
+    loadData();
   }
 
   // ── مساعدات ─────────────────────────────────
-  function showStatus(type, msg) { setSyncStatus(type); setSyncMsg(msg); setTimeout(()=>setSyncStatus(''), 4000); }
+  function showStatus(type, msg) {
+    setSyncStatus(type); setSyncMsg(msg);
+    setTimeout(() => setSyncStatus(''), 5000);
+  }
 
-  function openAdd(type) {
-    setModal({ type, item: newItem(type), index: -1 });
-  }
-  function openEdit(type, index) {
-    setModal({ type, item: JSON.parse(JSON.stringify(data[type][index])), index });
-  }
-  function saveModal() {
+  function openAdd(type)        { setModal({ type, item: newItem(type), index: -1 }); }
+  function openEdit(type, index){ setModal({ type, item: JSON.parse(JSON.stringify(data[type][index])), index }); }
+
+  // حفظ + نشر تلقائي بخطوة واحدة
+  async function saveModal() {
     const { type, item, index } = modal;
-    const list = [...(data[type]||[])];
+    const list = [...(data[type] || [])];
     if (index === -1) list.unshift(item); else list[index] = item;
-    setData(d => ({ ...d, [type]: list }));
+    const updatedData = { ...data, [type]: list };
+    setData(updatedData);
     setModal(null);
+    // نشر فوري — لا حاجة لزر "حفظ ونشر" منفصل
+    await syncData(updatedData);
+    loadData();
   }
   function deleteItem(type, index) {
     if (!confirm('حذف هذا العنصر؟')) return;

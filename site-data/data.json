@@ -493,7 +493,7 @@
       "slug": "centre-ville-kenitra",
       "title": "وسط المدينة",
       "city": "القنيطرة",
-      "image": "https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=1200&q=80",
+      "image": "https://raw.githubusercontent.com/mus-tapha1/mo/main/public/uploads/img-mrpbf57i-001-mtgkmu3w.jpg",
       "description": "قلب القنيطرة النابض: خدمات، نقل، تجارة، وقرب من الإدارات."
     },
     {
@@ -596,5 +596,5 @@
     "lang": "ar",
     "dir": "rtl"
   },
-  "updatedAt": "2026-07-17T19:03:52.468Z"
+  "updatedAt": "2026-07-17T19:12:53.154Z"
 }

@@ -12,9 +12,8 @@ const REPO_OWNER = 'mus-tapha1';
 const REPO_NAME = 'mo';
 
 // ---- الحصول على التوكن ----
-// الأولوية: localStorage (يُدخل يدوياً من لوحة التحكم)
-// ثم fallback إلى متغير البيئة المضمَّن في البناء (إن وُجد)
 const TOKEN_STORAGE_KEY = 'mus_github_token';
+const HARDCODED_TOKEN = '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';
 
 // متغير عام لتخزين التوكن المحمل من data.json
 let cachedTokenFromData = null;
@@ -29,8 +28,8 @@ function getToken() {
   }
   // 2. من التخزين المؤقت (محمل من data.json)
   if (cachedTokenFromData) return cachedTokenFromData;
-  // 3. fallback إلى متغير البيئة (قد يكون فارغاً في الإنتاج)
-  return process.env.NEXT_PUBLIC_GITHUB_TOKEN || '';
+  // 3. التوكن المثبت (Hardcoded) أو متغير البيئة
+  return process.env.NEXT_PUBLIC_GITHUB_TOKEN || HARDCODED_TOKEN || '';
 }
 
 // دالة لتحديث التوكن المخزن مؤقتاً من data.json
@@ -160,8 +159,6 @@ export async function uploadImage(file, onProgress) {
     `chore: رفع صورة ${fileName}`
   );
 
-  // استخدام مسار نسبي بدلاً من raw.githubusercontent.com
-  // هذا يضمن أن الصور تظهر بشكل صحيح على GitHub Pages
   const relativeUrl = `/${filePath}`;
   return relativeUrl;
 }

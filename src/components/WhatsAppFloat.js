@@ -1,8 +1,14 @@
 'use client';
 
 import { whatsappLink } from '@/config/site';
+import { usePathname } from 'next/navigation';
 
 export default function WhatsAppFloat() {
+  const pathname = usePathname();
+  const isDashboard = pathname?.startsWith('/dashboard');
+
+  if (isDashboard) return null;
+
   const href = whatsappLink('السلام عليكم، أريد الاستفسار عن العقارات المتوفرة لديكم.');
 
   return (

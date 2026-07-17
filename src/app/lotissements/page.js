@@ -45,7 +45,7 @@ export default function LotissementsPage() {
                   </div>
                 </div>
                 <div className="p-4 flex flex-wrap gap-2">
-                  {lot.features.map((f, j) => (
+                  {(lot.features || []).map((f, j) => (
                     <span key={j} className="badge-gold px-2.5 py-1 rounded-full text-[10px]">{f}</span>
                   ))}
                 </div>

@@ -75,7 +75,7 @@ export default function LotissementDetailPage({ params }) {
           <Reveal>
             <p className="text-creme/70 text-base leading-relaxed mb-8">{lot.description}</p>
             <div className="flex flex-wrap gap-3 mb-8">
-              {lot.features.map((f, i) => (
+              {(lot.features || []).map((f, i) => (
                 <span key={i} className="badge-gold px-4 py-2 rounded-full text-sm">{f}</span>
               ))}
             </div>

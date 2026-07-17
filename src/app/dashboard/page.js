@@ -26,7 +26,7 @@ function newItem(type) {
   if (type === 'properties')
     return { id:`MUS-${ts}`, title:'', type:'شقة', typeKey:'apartment', price:0, priceLabel:'', city:'القنيطرة', surface:0, image:'', gallery:[], featured:false, description:'' };
   if (type === 'lotissements')
-    return { id:`L-${ts}`, slug:'', title:'', city:'القنيطرة', image:'', description:'' };
+    return { id:`L-${ts}`, slug:'', title:'', city:'القنيطرة', image:'', description:'', features:[] };
   if (type === 'manatiq')
     return { slug:'', title:'', city:'القنيطرة', image:'', description:'' };
   if (type === 'videos')

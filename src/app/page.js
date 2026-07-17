@@ -35,7 +35,7 @@ export default function HomePage() {
     { value: properties.length, label: 'عقار متوفّر' },
     { value: lotissements.length, label: 'تجزئة فاخرة' },
     { value: manatiq.length, label: 'منطقة مغطّاة' },
-    { value: videos.length, label: 'فيديو متيدياتي' },
+    { value: videos.length, label: 'فيديو ميداني' },
   ], [properties.length, lotissements.length, manatiq.length, videos.length]);
 
   const handleSearch = (e) => {

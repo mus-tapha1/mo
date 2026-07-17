@@ -17,7 +17,7 @@ export const generatedData = {
       "city": "القنيطرة",
       "area": "حي راقٍ بالقنيطرة",
       "surface": 320,
-      "image": "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&q=80",
+      "image": "https://raw.githubusercontent.com/mus-tapha1/mo/main/public/uploads/img-mrpbggel-001-d2k0jdzx.jpg",
       "gallery": [
         "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&q=80",
         "https://images.unsplash.com/photo-1564013799919-ab6000bffc1e?w=1200&q=80"
@@ -61,54 +61,6 @@ export const generatedData = {
       "featured": true
     },
     {
-      "id": "MUS-MAG-01",
-      "type": "محل تجاري",
-      "typeKey": "commercial",
-      "title": "محل تجاري · 65م²",
-      "price": 420000,
-      "priceLabel": "420.000 درهم",
-      "city": "القنيطرة",
-      "area": "شارع حيوي",
-      "surface": 65,
-      "image": "https://images.unsplash.com/photo-1582407947194-0c9a0d4d4e3a?w=1200&q=80",
-      "gallery": [
-        "https://images.unsplash.com/photo-1582407947194-0c9a0d4d4e3a?w=1200&q=80"
-      ],
-      "basics": [
-        {
-          "label": "نوع العقار",
-          "value": "محل تجاري"
-        },
-        {
-          "label": "المساحة",
-          "value": "65م²"
-        },
-        {
-          "label": "الموقع",
-          "value": "القنيطرة — شارع حيوي"
-        },
-        {
-          "label": "الواجهة",
-          "value": "واجهة على شارع رئيسي"
-        },
-        {
-          "label": "التوجيه",
-          "value": "جنوب"
-        },
-        {
-          "label": "الوضع القانوني",
-          "value": "محفظة"
-        }
-      ],
-      "lecture": [
-        "المحل في موقع ذي حركة مرور جيدة، ما يعزز فرص النشاط التجاري حسب المعطيات المعروضة.",
-        "الواجهة على شارع رئيسي تزيد الظهور، لكن يجب التحقق من طبيعة الجوار التجاري وكثافة المراجعين فعلياً.",
-        "المساحة 65م² مناسبة لأنشطة متعددة (تجزئة، خدمات، مطعم صغير) شرط احترام قوانين الاستغلال."
-      ],
-      "note": "قراءة أولية فقط، والمعاينة الميدانية ضرورية قبل القرار.",
-      "featured": true
-    },
-    {
       "id": "MUS-MAG-02",
       "type": "محل تجاري",
       "typeKey": "commercial",
@@ -118,7 +70,7 @@ export const generatedData = {
       "city": "القنيطرة",
       "area": "موقع استراتيجي",
       "surface": 75,
-      "image": "https://images.unsplash.com/photo-1600596357905-23c75a4a8d92?w=1200&q=80",
+      "image": "https://raw.githubusercontent.com/mus-tapha1/mo/main/public/uploads/img-mroe3vq6-j1kz.jpg",
       "gallery": [
         "https://images.unsplash.com/photo-1600596357905-23c75a4a8d92?w=1200&q=80"
       ],
@@ -521,25 +473,12 @@ export const generatedData = {
       "slug": "hadika-2-kenitra",
       "title": "حدائق حلولة 2",
       "city": "القنيطرة",
-      "image": "https://images.unsplash.com/photo-1600596357905-23c75a4a8d92?w=1200&q=80",
+      "image": "https://raw.githubusercontent.com/mus-tapha1/mo/main/public/uploads/img-mrpa5of4-m7qc.jpg",
       "description": "المرحلة الثانية من مشروع حدائق حلولة، بمساحات أكبر وتشطيبات فاخرة.",
       "features": [
         "بقع فيلا واسعة",
         "مساحات خضراء",
         "قرب من المرافق"
-      ]
-    },
-    {
-      "id": "riad-kenitra",
-      "slug": "riad-kenitra",
-      "title": "تجزئة الرياض",
-      "city": "القنيطرة",
-      "image": "https://images.unsplash.com/photo-1613490493576-7fde63acd841?w=1200&q=80",
-      "description": "تجزئة سكنية تابعة للعمران بالقنيطرة، موجّهة للعائلات الباحثة عن هدوء وقرب من الخدمات.",
-      "features": [
-        "بقع سكنية",
-        "هدوء",
-        "قرب المدارس"
       ]
     }
   ],
@@ -555,14 +494,14 @@ export const generatedData = {
       "slug": "mimouza-kenitra",
       "title": "حي الميموزة",
       "city": "القنيطرة",
-      "image": "https://images.unsplash.com/photo-1564013799919-ab6000bffc1e?w=1200&q=80",
+      "image": "https://raw.githubusercontent.com/mus-tapha1/mo/main/public/uploads/img-1784311898330-IMG_20260715_WA0012.jpg",
       "description": "حي سكني راقٍ معروف بهدوئه وقربه من المرافق التعليمية والتجارية."
     },
     {
       "slug": "val-fleuri-kenitra",
       "title": "فال فلوري",
       "city": "القنيطرة",
-      "image": "https://images.unsplash.com/photo-1600585154526-990dced4db54?w=1200&q=80",
+      "image": "https://raw.githubusercontent.com/mus-tapha1/mo/main/public/uploads/img-mrpb3gyl-fuome.jpg",
       "description": "منطقة راقية تجمع بين الفلل الفاخرة والمساحات الخضراء الواسعة."
     }
   ],
@@ -575,15 +514,6 @@ export const generatedData = {
       "youtubeId": "LXb3EKWsInQ",
       "thumbnail": "https://img.youtube.com/vi/LXb3EKWsInQ/maxresdefault.jpg",
       "duration": "04:12"
-    },
-    {
-      "id": "video-02",
-      "title": "ميزان السكن: عناوين تحتاج مراجعة قبل العرض",
-      "description": "كيف تقرأ العنوان العقاري وتفهم الوضع القانوني قبل الشراء.",
-      "youtubeUrl": "https://www.youtube.com/watch?v=2Vv-BfVoq4g",
-      "youtubeId": "2Vv-BfVoq4g",
-      "thumbnail": "https://img.youtube.com/vi/2Vv-BfVoq4g/maxresdefault.jpg",
-      "duration": "06:30"
     },
     {
       "id": "video-03",
@@ -625,11 +555,13 @@ export const generatedData = {
   "config": {
     "brand": {
       "name": "MUSTAPHA IMMOBILIER",
-      "nameAr": "مصطفى للعقارات",
+      "nameAr": "مصطفى للعقارات - المسؤول التقني",
       "country": "Morocco",
       "countryAr": "المغرب",
       "tagline": "VOTRE CLÉ VERS L’EXCEPTION",
       "taglineAr": "مفاتيحك نحو التميّز",
+      "suffix": "",
+      "suffixAr": "",
       "fullAr": "مصطفى للعقارات — المغرب"
     },
     "colors": {
@@ -641,10 +573,10 @@ export const generatedData = {
     "city": "القنيطرة",
     "cityFr": "Kénitra",
     "contact": {
-      "phone": "+212 6 00 00 00 00",
-      "phoneHref": "+212600000000",
+      "phone": "0778878421",
+      "phoneHref": "+212722916507",
       "email": "contact@mustapha-immobilier.ma",
-      "whatsapp": "+212600000000"
+      "whatsapp": "+212722916597"
     },
     "social": {
       "facebook": "https://www.facebook.com/",
@@ -652,14 +584,13 @@ export const generatedData = {
       "youtube": "https://www.youtube.com/",
       "tiktok": "https://www.tiktok.com/",
       "twitter": "https://x.com/",
-      "pinterest": "https://www.pinterest.com/",
+      "pinterest": "https://pinterest.com/",
       "linktree": "https://linktr.ee/"
     },
     "lang": "ar",
     "dir": "rtl"
   },
-  "adminPassword": "mustapha2026",
-  "updatedAt": "2026-07-16T19:16:08.838Z"
+  "updatedAt": "2026-07-17T19:32:50.720Z"
 };
 
 export default generatedData;

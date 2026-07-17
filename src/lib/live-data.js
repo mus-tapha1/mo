@@ -44,15 +44,19 @@ export function normalizeImageUrl(url) {
   if (!url || typeof url !== 'string') return url;
   // إذا كان رابطاً كاملاً (http/https/data:) نعيده كما هو
   if (/^(https?:|data:)/i.test(url)) return url;
-  // إذا كان مساراً يبدأ بـ /public/uploads/ نحوّله إلى raw URL
-  if (url.startsWith('/public/uploads/') || url.startsWith('public/uploads/')) {
-    const cleanPath = url.replace(/^\/?public\//, '');
-    return `${RAW_BASE}/public/${cleanPath.replace(/^public\//, '')}`;
+
+  let cleanPath = url.replace(/^\//, ''); // إزالة الشرطة المائلة الأمامية إن وجدت
+
+  // إذا كان المسار يبدأ بـ uploads/ (بدون public/)
+  if (cleanPath.startsWith('uploads/')) {
+    cleanPath = `public/${cleanPath}`;
   }
-  // إذا كان مساراً نسبياً يبدأ بـ /uploads/ (بعد بناء سابق)
-  if (url.startsWith('/uploads/') || url.startsWith('uploads/')) {
-    return `${RAW_BASE}/public/${url.replace(/^\/?uploads/, 'uploads')}`;
+
+  // إذا كان المسار يبدأ بـ public/uploads/
+  if (cleanPath.startsWith('public/uploads/')) {
+    return `${RAW_BASE}/${cleanPath}`;
   }
+
   return url;
 }
 

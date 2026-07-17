@@ -78,15 +78,21 @@ export function detectRepoFromToken(token) {
 
 // ---- الحصول على SHA ملف موجود (لازم للتحديث) ----
 async function getFileSha(token, owner, repo, path, branch = 'main') {
-  const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}?ref=${branch}`;
-  const res = await fetch(url, {
-    headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' },
-  });
-  if (res.status === 404) return null;
-  if (!res.ok) throw new Error(`فشل الحصول على معلومات الملف: ${res.status}`);
-  const data = await res.json();
-  return data.sha;
-}
+    // كسر كاش المتصفح لضمان الحصول على SHA الأحدث دائماً
+    const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}?ref=${branch}&_t=${Date.now()}`;
+    const res = await fetch(url, {
+      cache: 'no-store',
+      headers: {
+        Authorization: `token ${token}`,
+        Accept: 'application/vnd.github.v3+json',
+        'Cache-Control': 'no-cache, no-store',
+      },
+    });
+    if (res.status === 404) return null;
+    if (!res.ok) throw new Error(`فشل الحصول على معلومات الملف: ${res.status}`);
+    const data = await res.json();
+    return data.sha;
+    }
 
 // ---- رفع/تحديث ملف في المستودع ----
 async function uploadFileToRepo(token, owner, repo, path, content, message, branch = 'main') {

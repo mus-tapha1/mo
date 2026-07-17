@@ -1,43 +1,26 @@
 // ============================================================
 //  نظام المزامنة مع GitHub API — MUSTAPHA IMMOBILIER
-//  - رفع الصور إلى public/uploads/ في المستودع
-//  - تحديث ملف البيانات المركزي site-data/data.json
 // ============================================================
 
 const DATA_FILE_PATH = 'site-data/data.json';
 const UPLOADS_DIR = 'public/uploads';
-
-// إعدادات المستودع الثابتة
 const REPO_OWNER = 'mus-tapha1';
 const REPO_NAME = 'mo';
-
-// ---- الحصول على التوكن ----
 const TOKEN_STORAGE_KEY = 'mus_github_token';
 
-
-// متغير عام لتخزين التوكن المحمل من data.json
 let cachedTokenFromData = null;
 
 function getToken() {
-  // 1. من localStorage (الأولوية — يدوياً ولا يُضمَّن في البناء)
   if (typeof window !== 'undefined') {
     try {
       const stored = localStorage.getItem(TOKEN_STORAGE_KEY);
       if (stored && stored.trim()) return stored.trim();
-    } catch { /* تجاهل */ }
+    } catch { /* ignore */ }
   }
-  // 2. من التخزين المؤقت (محمل من data.json)
   if (cachedTokenFromData) return cachedTokenFromData;
-  // 3. التوكن الآمن (المشفر) أو متغير البيئة
-  // 3. التوكن الآمن (المشفر) أو متغير البيئة
-  // يجب أن يكون التوكن متاحاً في بيئة الخادم (Next.js API routes) وليس بالضرورة في العميل
-  // إذا كان هذا الكود يُنفّذ في العميل، فـ process.env لن يكون متاحاً إلا إذا تم تمريره بشكل صريح.
-  // الأفضل هو الاعتماد على التوكن المخزن في localStorage أو data.json.
-  // ومع ذلك، إذا كان هناك متغير بيئة، فليكن هو الأولوية الأخيرة.
   return process.env.NEXT_PUBLIC_GITHUB_TOKEN || process.env.SITE_GITHUB_TOKEN || '';
 }
 
-// دالة لتحديث التوكن المخزن مؤقتاً من data.json
 export function setCachedToken(token) {
   if (token && token.trim()) {
     cachedTokenFromData = token.trim();
@@ -52,7 +35,6 @@ export function saveSyncSettings(token) {
   if (typeof window === 'undefined') return;
   if (token && token.trim()) {
     localStorage.setItem(TOKEN_STORAGE_KEY, token.trim());
-    // تحديث التخزين المؤقت أيضاً
     cachedTokenFromData = token.trim();
   } else {
     localStorage.removeItem(TOKEN_STORAGE_KEY);
@@ -69,21 +51,7 @@ export function isSyncConfigured() {
   return !!getToken();
 }
 
-// ---- استخراج معلومات التوكن ----
-export function detectRepoFromToken(token) {
-  return fetch('https://api.github.com/user', {
-    headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' },
-  })
-    .then((r) => {
-      if (!r.ok) throw new Error('رمز الوصول غير صالح');
-      return r.json();
-    })
-    .then((data) => ({ login: data.login }));
-}
-
-// ---- الحصول على SHA ملف موجود (لازم للتحديث) ----
 async function getFileSha(token, owner, repo, path, branch = 'main') {
-    // كسر كاش المتصفح لضمان الحصول على SHA الأحدث دائماً
     const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}?ref=${branch}&_t=${Date.now()}`;
     try {
       const res = await fetch(url, {
@@ -100,14 +68,10 @@ async function getFileSha(token, owner, repo, path, branch = 'main') {
       const data = await res.json();
       return data.sha;
     } catch (err) {
-      if (err instanceof TypeError && err.message.includes('Failed to fetch')) {
-        throw new Error('فشل الاتصال بـ GitHub. تحقق من اتصالك بالإنترنت.');
-      }
       throw err;
     }
 }
 
-// ---- رفع/تحديث ملف في المستودع ----
 async function uploadFileToRepo(token, owner, repo, path, content, message, branch = 'main') {
   if (!token || !token.trim()) {
     throw new Error('التوكن غير صحيح. يرجى التحقق من إعدادات المزامنة.');
@@ -116,7 +80,7 @@ async function uploadFileToRepo(token, owner, repo, path, content, message, bran
   const sha = await getFileSha(token, owner, repo, path, branch);
   const body = {
     message,
-    content, // base64
+    content, 
     branch,
   };
   if (sha) body.sha = sha;
@@ -140,201 +104,50 @@ async function uploadFileToRepo(token, owner, repo, path, content, message, bran
       try {
         const err = await res.json();
         if (err.message) errMsg = err.message;
-        if (err.errors && err.errors[0]) errMsg = err.errors[0].message;
       } catch { /* ignore */ }
       throw new Error(errMsg);
     }
     return res.json();
   } catch (err) {
-    if (err instanceof TypeError && err.message.includes('Failed to fetch')) {
-      throw new Error('فشل الاتصال بـ GitHub. تحقق من اتصالك بالإنترنت أو أن التوكن صحيح.');
-    }
     throw err;
   }
 }
 
-// ---- تحويل ملف إلى base64 (للرفع) ----
-function fileToBase64(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      const result = reader.result.split(',')[1];
-      resolve(result);
-    };
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
+export async function syncDataToRepo(data) {
+  const token = getToken();
+  if (!token) throw new Error('المزامنة غير مفعلة. يرجى إدخال التوكن في الإعدادات.');
+  
+  const content = btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2))));
+  return await uploadFileToRepo(token, REPO_OWNER, REPO_NAME, DATA_FILE_PATH, content, `Update data.json [CMS] ${new Date().toISOString()}`);
 }
 
-// ---- توليد اسم فريد للصورة ----
-function generateImageName(file) {
-  const ext = file.name.split('.').pop().toLowerCase().replace(/[^a-z0-9]/g, '') || 'jpg';
-  const ts = Date.now().toString(36);
-  const rand = Math.random().toString(36).substring(2, 6);
-  return `img-${ts}-${rand}.${ext}`;
-}
-
-// ============================================================
-//  رفع صورة واحدة إلى المستودع
-// ============================================================
-export async function uploadImage(file, onProgress) {
-  const { token, owner, repo } = getSyncSettings();
-  if (!token || !token.trim()) {
-    throw new Error('لم يتم إعداد GitHub. يرجى إدخال توكن صحيح في الإعدادات.');
-  }
-
-  if (onProgress) onProgress('جاري تحضير الصورة...');
-
-  try {
-    const base64 = await fileToBase64(file);
-    const fileName = generateImageName(file);
-    const filePath = `${UPLOADS_DIR}/${fileName}`;
-
-    if (onProgress) onProgress('جاري رفع الصورة إلى المستودع...');
-
-    await uploadFileToRepo(
-      token, owner, repo, filePath, base64,
-      `chore: رفع صورة ${fileName}`
-    );
-
-    // نرجع raw GitHub URL ليعمل الصورة فوراً على الموقع المنشور بدون بناء
-    const rawUrl = `https://raw.githubusercontent.com/${owner}/${repo}/main/${filePath}`;
-    return rawUrl;
-  } catch (err) {
-    throw err;
-  }
-}
-
-// ============================================================
-//  رفع عدة صور (للمعرض)
-// ============================================================
-export async function uploadImages(files, onProgress) {
-  const urls = [];
-  for (let i = 0; i < files.length; i++) {
-    if (onProgress) onProgress(`رفع الصورة ${i + 1} من ${files.length}...`);
-    const url = await uploadImage(files[i]);
-    urls.push(url);
-  }
-  return urls;
-}
-
-// ============================================================
-//  تحديث ملف البيانات المركزي (data.json)
-// ============================================================
-export async function syncDataToRepo(data, onProgress) {
-  const { token, owner, repo } = getSyncSettings();
-  if (!token || !token.trim()) {
-    throw new Error('لم يتم إعداد GitHub. يرجى إدخال توكن صحيح في الإعدادات.');
-  }
-
-  if (onProgress) onProgress('جاري تحديث ملف البيانات...');
-
-  try {
-    const fullData = {
-      ...data,
-      updatedAt: new Date().toISOString(),
-    };
-
-    const jsonStr = JSON.stringify(fullData, null, 2);
-    const base64 = btoa(unescape(encodeURIComponent(jsonStr)));
-
-    const result = await uploadFileToRepo(
-      token, owner, repo, DATA_FILE_PATH, base64,
-      `data: تحديث البيانات المركزية (${new Date().toLocaleString('ar-MA')})`
-    );
-
-    return result;
-  } catch (err) {
-    throw err;
-  }
-}
-
-// ============================================================
-//  قراءة البيانات المركزية من المستودع
-// ============================================================
-//  حذف صورة من المستودع (public/uploads/)
-//  يقبل مساراً نسبياً (/public/uploads/img.jpg) أو raw URL كاملاً
-// ============================================================
-export async function deleteImage(imageUrl) {
-  const { token, owner, repo } = getSyncSettings();
-  if (!token) throw new Error('لم يتم إعداد GitHub.');
-  if (!imageUrl) return;
-
-  // استخراج مسار الملف من الرابط أو المسار
-  let filePath;
-  if (imageUrl.includes('raw.githubusercontent.com')) {
-    // raw URL: .../main/public/uploads/img.jpg
-    const match = imageUrl.match(/\/main\/(.+)$/);
-    filePath = match ? match[1] : null;
-  } else if (imageUrl.startsWith('/public/uploads/') || imageUrl.startsWith('public/uploads/')) {
-    filePath = imageUrl.replace(/^\/?/, '');
-  } else if (imageUrl.startsWith('/uploads/') || imageUrl.startsWith('uploads/')) {
-    filePath = `public/${imageUrl.replace(/^\/?/, '')}`;
-  } else {
-    return; // ليست صورة مرفوعة محلياً
-  }
-
-  if (!filePath) return;
-
-  const sha = await getFileSha(token, owner, repo, filePath, 'main');
-  if (!sha) return; // الملف غير موجود — لا شيء لنحذفه
-
-  const url = `https://api.github.com/repos/${owner}/${repo}/contents/${filePath}`;
-  const res = await fetch(url, {
-    method: 'DELETE',
-    headers: {
-      Authorization: `token ${token}`,
-      Accept: 'application/vnd.github.v3+json',
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      message: `chore: حذف صورة ${filePath.split('/').pop()}`,
-      sha,
-      branch: 'main',
-    }),
-  });
-
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err.message || `فشل حذف الصورة: ${res.status}`);
-  }
-  return res.json();
-}
-
-// ============================================================
 export async function fetchDataFromRepo() {
-  const { owner, repo } = getSyncSettings();
-  const rawUrl = `https://raw.githubusercontent.com/${owner}/${repo}/main/${DATA_FILE_PATH}`;
-  const res = await fetch(rawUrl, { cache: 'no-store' });
-  if (!res.ok) throw new Error(`فشل تحميل البيانات: ${res.status}`);
-  return res.json();
+  const url = `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/main/${DATA_FILE_PATH}?v=${Date.now()}`;
+  try {
+    const res = await fetch(url, { cache: 'no-store' });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch {
+    return null;
+  }
 }
 
-// ============================================================
-//  التحقق من حالة الـ Actions بعد التحديث
-// ============================================================
 export async function checkActionsStatus() {
-  const { token, owner, repo } = getSyncSettings();
+  const token = getToken();
   if (!token) return null;
-  const url = `https://api.github.com/repos/${owner}/${repo}/actions/runs?per_page=1`;
-  const res = await fetch(url, {
-    headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' },
-  });
-  if (!res.ok) return null;
-  const data = await res.json();
-  return data.workflow_runs?.[0] || null;
+  
+  const url = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/actions/runs?per_page=1`;
+  try {
+    const res = await fetch(url, {
+      headers: {
+        'Authorization': `token ${token}`,
+        'Accept': 'application/vnd.github.v3+json',
+      },
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data.workflow_runs[0] || null;
+  } catch {
+    return null;
+  }
 }
-
-export default {
-  getSyncSettings,
-  saveSyncSettings,
-  clearSyncSettings,
-  isSyncConfigured,
-  detectRepoFromToken,
-  uploadImage,
-  uploadImages,
-  deleteImage,
-  syncDataToRepo,
-  fetchDataFromRepo,
-  checkActionsStatus,
-};

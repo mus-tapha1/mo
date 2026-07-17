@@ -338,7 +338,7 @@ export function saveTokenToData(token) {
   return syncDataToRepo(data);
 }
 
-export { propertyTypes, budgetRanges, DEFAULT_ADMIN_PASSWORD, isSyncConfigured, getSyncSettings, initializeTokenFromData };
+export { propertyTypes, budgetRanges, DEFAULT_ADMIN_PASSWORD, isSyncConfigured, getSyncSettings };
 export default {
   getProperties, getPropertyById, getFeaturedProperties,
   addProperty, updateProperty, deleteProperty, resetProperties,

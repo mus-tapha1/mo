@@ -140,3 +140,41 @@ export async function fetchLiveData() {
     return normalizeAllImages(fallbackData);
   }
 }
+
+export function getFallbackData() {
+  return normalizeAllImages(fallbackData);
+}
+
+export function getLiveDataSync() {
+  const cached = readCache();
+  if (cached) return cached;
+  return getFallbackData();
+}
+
+export async function refreshLiveData() {
+  if (isClient) {
+    localStorage.removeItem(CACHE_KEY);
+    localStorage.removeItem(CACHE_TIMESTAMP_KEY);
+  }
+  return fetchLiveData();
+}
+
+export function getFallbackProperties() {
+  return (fallbackData.properties || []).map(normalizeItemImages);
+}
+
+export function getFallbackLotissements() {
+  return (fallbackData.lotissements || []).map(normalizeItemImages);
+}
+
+export function getFallbackManatiq() {
+  return (fallbackData.manatiq || []).map(normalizeItemImages);
+}
+
+export function getFallbackVideos() {
+  return (fallbackData.videos || []).map(normalizeItemImages);
+}
+
+export function getFallbackConfig() {
+  return normalizeItemImages(fallbackData.config || {});
+}

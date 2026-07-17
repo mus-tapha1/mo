@@ -24,38 +24,29 @@ const RAW_URL = `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/ma
 
 const CACHE_KEY = 'mus_live_data';
 const CACHE_TIMESTAMP_KEY = 'mus_live_data_ts';
-// مدة صلاحية الذاكرة المؤقتة: 5 دقائق
-const CACHE_TTL = 5 * 60 * 1000;
+// مدة صلاحية الذاكرة المؤقتة: تم تقليلها لـ 30 ثانية لضمان الظهور الفوري
+const CACHE_TTL = 30 * 1000;
 
 const isClient = typeof window !== 'undefined';
 
 // ============================================================
 //  تطبيع مسارات الصور — تحويل المسارات النسبية إلى raw GitHub URL
-//
-//  الصور المرفوعة من لوحة التحكم تُخزَّن كمسار نسبي مثل:
-//    /public/uploads/img-xxx.jpg
-//  على الموقع المنشور (بدون بناء) لا يمكن الوصول لهذا المسار،
-//  لذا نحوّله إلى raw GitHub URL الذي يعمل دائماً:
-//    https://raw.githubusercontent.com/mus-tapha1/mo/main/public/uploads/img-xxx.jpg
 // ============================================================
 const RAW_BASE = `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/main`;
 
 export function normalizeImageUrl(url) {
   if (!url || typeof url !== 'string') return url;
-  // إذا كان رابطاً كاملاً (http/https/data:) نعيده كما هو
   if (/^(https?:|data:)/i.test(url)) return url;
 
-  let cleanPath = url.replace(/^\//, ''); // إزالة الشرطة المائلة الأمامية إن وجدت
+  let cleanPath = url.replace(/^\//, ''); 
   if (cleanPath.endsWith('/')) {
-    cleanPath = cleanPath.slice(0, -1); // إزالة الشرطة المائلة الزائدة في النهاية
+    cleanPath = cleanPath.slice(0, -1);
   }
 
-  // إذا كان المسار يبدأ بـ uploads/ (بدون public/)
   if (cleanPath.startsWith('uploads/')) {
     cleanPath = `public/${cleanPath}`;
   }
 
-  // إذا كان المسار يبدأ بـ public/uploads/
   if (cleanPath.startsWith('public/uploads/')) {
     return `${RAW_BASE}/${cleanPath}`;
   }
@@ -63,7 +54,6 @@ export function normalizeImageUrl(url) {
   return url;
 }
 
-// تطبيع جميع الصور في عنصر واحد (image + gallery)
 function normalizeItemImages(item) {
   if (!item || typeof item !== 'object') return item;
   const out = { ...item };
@@ -74,14 +64,12 @@ function normalizeItemImages(item) {
   if (out.images && Array.isArray(out.images)) {
     out.images = out.images.map(normalizeImageUrl);
   }
-  // حقول إضافية محتملة
   if (out.logo) out.logo = normalizeImageUrl(out.logo);
   if (out.thumbnail) out.thumbnail = normalizeImageUrl(out.thumbnail);
   if (out.cover) out.cover = normalizeImageUrl(out.cover);
   return out;
 }
 
-// تطبيع جميع الصور في البيانات الكاملة
 function normalizeAllImages(data) {
   if (!data || typeof data !== 'object') return data;
   const out = { ...data };
@@ -97,14 +85,12 @@ function normalizeAllImages(data) {
   if (Array.isArray(out.videos)) {
     out.videos = out.videos.map(normalizeItemImages);
   }
-  // تطبيع صور الإعدادات
   if (out.config && typeof out.config === 'object') {
     out.config = normalizeItemImages(out.config);
   }
   return out;
 }
 
-// البيانات الافتراضية (من البناء)
 const fallbackData = {
   properties: (generatedData && Array.isArray(generatedData.properties) && generatedData.properties.length)
     ? generatedData.properties : _defaultProperties,
@@ -117,141 +103,40 @@ const fallbackData = {
   config: (generatedData && generatedData.config) ? generatedData.config : _defaultConfig,
 };
 
-// قراءة الذاكرة المؤقتة من localStorage
 function readCache() {
   if (!isClient) return null;
   try {
     const ts = localStorage.getItem(CACHE_TIMESTAMP_KEY);
     const raw = localStorage.getItem(CACHE_KEY);
     if (!raw || !ts) return null;
-    const age = Date.now() - parseInt(ts, 10);
-    if (age > CACHE_TTL) return null; // انتهت صلاحيتها
-    return JSON.parse(raw);
+    if (Date.now() - parseInt(ts) > CACHE_TTL) return null;
+    return normalizeAllImages(JSON.parse(raw));
   } catch {
     return null;
   }
 }
 
-// حفظ الذاكرة المؤقتة
 function writeCache(data) {
-  if (!isClient) return;
+  if (!isClient || !data) return;
   try {
     localStorage.setItem(CACHE_KEY, JSON.stringify(data));
     localStorage.setItem(CACHE_TIMESTAMP_KEY, Date.now().toString());
-  } catch {
-    // تجاهل أخطاء التخزين
-  }
+  } catch { /* ignore */ }
 }
-
-// جلب البيانات من GitHub (مع cache-busting)
-let _fetchPromise = null;
 
 export async function fetchLiveData() {
-  // إذا كان هناك طلب جارٍ، نعيد نفس الوعد
-  if (_fetchPromise) return _fetchPromise;
+  const cached = readCache();
+  if (cached) return cached;
 
-  _fetchPromise = (async () => {
-    // 1. تحقق من الذاكرة المؤقتة أولاً
-    const cached = readCache();
-    if (cached) {
-      // اطلب البيانات في الخلفية لتحديث الذاكرة (stale-while-revalidate)
-      _backgroundRefresh();
-      return cached;
-    }
-
-    // 2. جلب من GitHub
-    try {
-      const res = await fetch(`${RAW_URL}?_t=${Date.now()}`, { cache: 'no-store' });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = await res.json();
-      const normalized = normalizeAllImages(data);
-      writeCache(normalized);
-      return normalized;
-    } catch (err) {
-      // 3. fallback للبيانات الافتراضية
-      return fallbackData;
-    } finally {
-      _fetchPromise = null;
-    }
-  })();
-
-  return _fetchPromise;
-}
-
-// تحديث الذاكرة في الخلفية (بدون انتظار)
-let _bgRefreshing = false;
-function _backgroundRefresh() {
-  if (_bgRefreshing) return;
-  _bgRefreshing = true;
-  fetch(`${RAW_URL}?_t=${Date.now()}`, { cache: 'no-store' })
-    .then((r) => r.json())
-    .then((data) => {
-      writeCache(normalizeAllImages(data));
-    })
-    .catch(() => {})
-    .finally(() => {
-      _bgRefreshing = false;
-    });
-}
-
-// إجبار التحديث (عند الحاجة)
-export async function refreshLiveData() {
-  if (!isClient) return fallbackData;
   try {
-    const res = await fetch(`${RAW_URL}?_t=${Date.now()}`, { cache: 'no-store' });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const res = await fetch(`${RAW_URL}?v=${Date.now()}`, { cache: 'no-store' });
+    if (!res.ok) throw new Error('Fetch failed');
     const data = await res.json();
     const normalized = normalizeAllImages(data);
     writeCache(normalized);
     return normalized;
-  } catch {
-    return readCache() || fallbackData;
+  } catch (err) {
+    console.warn('Live data fetch failed, using fallback:', err);
+    return normalizeAllImages(fallbackData);
   }
 }
-
-// الحصول على البيانات الافتراضية فوراً (متزامن)
-export function getLiveDataSync() {
-  const cached = readCache();
-  if (cached) return cached;
-  return normalizeAllImages(fallbackData);
-}
-
-export function getFallbackData() {
-  return fallbackData;
-}
-
-// دوال مساعدة للوصول السريع
-export function getFallbackProperties() {
-  return fallbackData.properties;
-}
-export function getFallbackLotissements() {
-  return fallbackData.lotissements;
-}
-export function getFallbackManatiq() {
-  return fallbackData.manatiq;
-}
-export function getFallbackVideos() {
-  return fallbackData.videos;
-}
-export function getFallbackConfig() {
-  return fallbackData.config;
-}
-
-export { propertyTypes, budgetRanges, RAW_URL };
-
-export default {
-  fetchLiveData,
-  refreshLiveData,
-  getLiveDataSync,
-  getFallbackData,
-  getFallbackProperties,
-  getFallbackLotissements,
-  getFallbackManatiq,
-  getFallbackVideos,
-  getFallbackConfig,
-  propertyTypes,
-  budgetRanges,
-  RAW_URL,
-  normalizeImageUrl,
-  normalizeAllImages,
-};

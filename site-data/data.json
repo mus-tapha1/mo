@@ -507,7 +507,7 @@
       "slug": "val-fleuri-kenitra",
       "title": "فال فلوري",
       "city": "القنيطرة",
-      "image": "https://images.unsplash.com/photo-1600585154526-990dced4db54?w=1200&q=80",
+      "image": "https://raw.githubusercontent.com/mus-tapha1/mo/main/public/uploads/img-mrpb3gyl-fuome.jpg",
       "description": "منطقة راقية تجمع بين الفلل الفاخرة والمساحات الخضراء الواسعة."
     }
   ],
@@ -596,5 +596,5 @@
     "lang": "ar",
     "dir": "rtl"
   },
-  "updatedAt": "2026-07-17T18:41:18.434Z"
+  "updatedAt": "2026-07-17T19:03:52.468Z"
 }

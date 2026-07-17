@@ -1,0 +1,328 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&family=Cairo:wght@300;400;600;700;900&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Jost:wght@300;400;500;600&display=swap');
+
+:root {
+  --or: #c9a14a;
+  --or-clair: #e6c87a;
+  --or-fonce: #a67c30;
+  --noir: #0a0a0a;
+  --noir-50: #1a1a1a;
+  --creme: #f5efe0;
+  --ivoire: #faf7f0;
+}
+
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--noir);
+  color: var(--creme);
+  font-family: 'Tajawal', 'Cairo', sans-serif;
+  overflow-x: hidden;
+}
+
+/* ---- التمرير ---- */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #0a0a0a;
+}
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #c9a14a, #a67c30);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #e6c87a;
+}
+
+/* ---- النص الذهبي المتدرج ---- */
+.text-gold {
+  background: linear-gradient(135deg, #e6c87a 0%, #c9a14a 40%, #f0e0b0 60%, #a67c30 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-size: 200% auto;
+  animation: shimmer 4s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* ---- الحدود الذهبية ---- */
+.border-gold {
+  border-color: rgba(201, 161, 74, 0.3);
+}
+.border-gold-bright {
+  border-color: rgba(230, 200, 122, 0.6);
+}
+
+/* ---- بطاقة زجاجية ---- */
+.glass-card {
+  background: rgba(26, 26, 26, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(201, 161, 74, 0.15);
+}
+
+.glass-card:hover {
+  border-color: rgba(201, 161, 74, 0.5);
+  transition: border-color 0.4s ease, transform 0.4s ease;
+}
+
+/* ---- الخط الفاصل الذهبي ---- */
+.gold-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #c9a14a, transparent);
+}
+
+.gold-divider-vertical {
+  width: 1px;
+  background: linear-gradient(180deg, transparent, #c9a14a, transparent);
+}
+
+/* ---- زر فاخر ---- */
+.btn-gold {
+  background: linear-gradient(135deg, #c9a14a 0%, #e6c87a 50%, #a67c30 100%);
+  color: #0a0a0a;
+  font-weight: 700;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-gold:hover {
+  background: linear-gradient(135deg, #e6c87a 0%, #f0e0b0 50%, #c9a14a 100%);
+  box-shadow: 0 0 25px rgba(201, 161, 74, 0.4);
+  transform: translateY(-2px);
+}
+
+.btn-gold::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  transition: left 0.6s ease;
+}
+
+.btn-gold:hover::after {
+  left: 100%;
+}
+
+.btn-outline-gold {
+  background: transparent;
+  color: #e6c87a;
+  border: 1px solid rgba(201, 161, 74, 0.5);
+  transition: all 0.3s ease;
+}
+
+.btn-outline-gold:hover {
+  background: rgba(201, 161, 74, 0.1);
+  border-color: #e6c87a;
+  box-shadow: 0 0 20px rgba(201, 161, 74, 0.2);
+}
+
+/* ---- خلفية منقطة ---- */
+.dot-pattern {
+  background-image: radial-gradient(rgba(201, 161, 74, 0.08) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* ---- توهج ذهبي ---- */
+.gold-glow {
+  box-shadow: 0 0 40px rgba(201, 161, 74, 0.15);
+}
+
+/* ---- نمط القماش الفاخر ---- */
+.luxury-texture {
+  background:
+    radial-gradient(ellipse at top, rgba(201, 161, 74, 0.06), transparent 60%),
+    radial-gradient(ellipse at bottom, rgba(201, 161, 74, 0.04), transparent 60%),
+    #0a0a0a;
+}
+
+/* ---- حركات الدخول ---- */
+.animate-on-scroll {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+
+.animate-on-scroll.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ---- رقم كبير فاخر ---- */
+.display-number {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 600;
+}
+
+/* ---- علامة المفتاح الذهبي ---- */
+.key-icon {
+  filter: drop-shadow(0 0 6px rgba(201, 161, 74, 0.5));
+}
+
+/* ---- صورة بتأثير فاخر ---- */
+.luxury-image {
+  transition: transform 0.6s ease, filter 0.6s ease;
+}
+
+.luxury-image:hover {
+  transform: scale(1.05);
+  filter: brightness(1.1);
+}
+
+/* ---- شارة فاخرة ---- */
+.badge-gold {
+  background: linear-gradient(135deg, rgba(201, 161, 74, 0.2), rgba(230, 200, 122, 0.1));
+  border: 1px solid rgba(201, 161, 74, 0.4);
+  color: #e6c87a;
+}
+
+/* ============================================================
+   تحسينات الوصولية (Accessibility)
+   ============================================================ */
+
+/* ---- نمط التركيز بلوحة المفاتيح (focus-visible) ---- */
+*:focus-visible {
+  outline: 2px solid var(--or-clair);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* عناصر روابط وأزرار — مؤشر أوضح */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--or-clair);
+  outline-offset: 3px;
+}
+
+/* ---- رابط تخطّي إلى المحتوى (skip link) ---- */
+.skip-link {
+  position: absolute;
+  top: -100px;
+  right: 1rem;
+  z-index: 1000;
+  background: linear-gradient(135deg, #c9a14a, #e6c87a);
+  color: #0a0a0a;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0 0 0.75rem 0.75rem;
+  font-weight: 700;
+  font-size: 0.875rem;
+  transition: top 0.3s ease;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
+/* ---- تحسين تباين النص للقراءة ---- */
+.text-creme\/50 { color: rgba(245, 239, 224, 0.65); }
+
+/* ---- زر العودة للأعلى ---- */
+.scroll-top-btn {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 1.5rem;
+  z-index: 40;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 9999px;
+  background: linear-gradient(135deg, #c9a14a 0%, #e6c87a 50%, #a67c30 100%);
+  color: #0a0a0a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+  transition: opacity 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+  border: none;
+}
+
+.scroll-top-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 25px rgba(201, 161, 74, 0.4);
+}
+
+.scroll-top-btn.hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(10px);
+}
+
+/* ---- زر واتساب عائم ---- */
+.whatsapp-float {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 40;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 9999px;
+  background: #25D366;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.whatsapp-float:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 30px rgba(37, 211, 102, 0.6);
+}
+
+.whatsapp-float::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  border: 2px solid #25D366;
+  animation: whatsapp-pulse 2s ease-out infinite;
+}
+
+@keyframes whatsapp-pulse {
+  0% { transform: scale(1); opacity: 0.7; }
+  100% { transform: scale(1.6); opacity: 0; }
+}
+
+/* ---- تحسين الطباعة ---- */
+@media print {
+  header, footer, .scroll-top-btn, .whatsapp-float, .skip-link {
+    display: none !important;
+  }
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+}
+
+/* ---- احترام تفضيل تقليل الحركة ---- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

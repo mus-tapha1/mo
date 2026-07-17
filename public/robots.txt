@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard/
+
+Sitemap: https://mus-tapha1.github.io/mo/sitemap.xml

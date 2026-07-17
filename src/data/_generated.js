@@ -1,0 +1,665 @@
+// ============================================================
+//  ملف مُولَّد تلقائياً بواسطة scripts/prebuild.js
+//  لا تقم بتعديله يدوياً — سيتم الكتابة فوقه عند كل بناء.
+//  يحتوي على البيانات المركزية من site-data/data.json
+//  كثوابت JS آمنة للعميل (بدون وحدة fs).
+// ============================================================
+
+export const generatedData = {
+  "properties": [
+    {
+      "id": "MUS-VJ-01",
+      "type": "بقعة فيلا",
+      "typeKey": "villa-plot",
+      "title": "بقعة فيلا فاخرة · 320م²",
+      "price": 1300000,
+      "priceLabel": "1.300.000 درهم",
+      "city": "القنيطرة",
+      "area": "حي راقٍ بالقنيطرة",
+      "surface": 320,
+      "image": "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&q=80",
+      "gallery": [
+        "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&q=80",
+        "https://images.unsplash.com/photo-1564013799919-ab6000bffc1e?w=1200&q=80"
+      ],
+      "basics": [
+        {
+          "label": "نوع العقار",
+          "value": "بقعة فيلا"
+        },
+        {
+          "label": "المساحة",
+          "value": "320م²"
+        },
+        {
+          "label": "الموقع",
+          "value": "القنيطرة — حي راقٍ"
+        },
+        {
+          "label": "عدد الواجهات",
+          "value": "واجهة واحدة"
+        },
+        {
+          "label": "عرض الطريق",
+          "value": "12م"
+        },
+        {
+          "label": "التوجيه",
+          "value": "غرب"
+        },
+        {
+          "label": "الوضع القانوني",
+          "value": "محفظة"
+        }
+      ],
+      "lecture": [
+        "البقعة داخل تجزئة منظمة ومعروفة بالقنيطرة حسب المعطيات المعروضة فقط.",
+        "التوجيه نحو الغرب قد يمنح إضاءة أقوى بعد الزوال؛ يعتمد ذلك على الجوار الفعلي وارتفاع المباني المجاورة وعرض الشارع.",
+        "عرض الشارع وعدد الواجهات يؤثران على قابلية التصميم والولوج؛ المعاينة الميدانية ضرورية قبل القرار."
+      ],
+      "note": "قراءة أولية فقط، والمعاينة الميدانية ضرورية قبل القرار.",
+      "featured": true
+    },
+    {
+      "id": "MUS-MAG-01",
+      "type": "محل تجاري",
+      "typeKey": "commercial",
+      "title": "محل تجاري · 65م²",
+      "price": 420000,
+      "priceLabel": "420.000 درهم",
+      "city": "القنيطرة",
+      "area": "شارع حيوي",
+      "surface": 65,
+      "image": "https://images.unsplash.com/photo-1582407947194-0c9a0d4d4e3a?w=1200&q=80",
+      "gallery": [
+        "https://images.unsplash.com/photo-1582407947194-0c9a0d4d4e3a?w=1200&q=80"
+      ],
+      "basics": [
+        {
+          "label": "نوع العقار",
+          "value": "محل تجاري"
+        },
+        {
+          "label": "المساحة",
+          "value": "65م²"
+        },
+        {
+          "label": "الموقع",
+          "value": "القنيطرة — شارع حيوي"
+        },
+        {
+          "label": "الواجهة",
+          "value": "واجهة على شارع رئيسي"
+        },
+        {
+          "label": "التوجيه",
+          "value": "جنوب"
+        },
+        {
+          "label": "الوضع القانوني",
+          "value": "محفظة"
+        }
+      ],
+      "lecture": [
+        "المحل في موقع ذي حركة مرور جيدة، ما يعزز فرص النشاط التجاري حسب المعطيات المعروضة.",
+        "الواجهة على شارع رئيسي تزيد الظهور، لكن يجب التحقق من طبيعة الجوار التجاري وكثافة المراجعين فعلياً.",
+        "المساحة 65م² مناسبة لأنشطة متعددة (تجزئة، خدمات، مطعم صغير) شرط احترام قوانين الاستغلال."
+      ],
+      "note": "قراءة أولية فقط، والمعاينة الميدانية ضرورية قبل القرار.",
+      "featured": true
+    },
+    {
+      "id": "MUS-MAG-02",
+      "type": "محل تجاري",
+      "typeKey": "commercial",
+      "title": "محل تجاري · 75م²",
+      "price": 1500000,
+      "priceLabel": "1.500.000 درهم",
+      "city": "القنيطرة",
+      "area": "موقع استراتيجي",
+      "surface": 75,
+      "image": "https://images.unsplash.com/photo-1600596357905-23c75a4a8d92?w=1200&q=80",
+      "gallery": [
+        "https://images.unsplash.com/photo-1600596357905-23c75a4a8d92?w=1200&q=80"
+      ],
+      "basics": [
+        {
+          "label": "نوع العقار",
+          "value": "محل تجاري"
+        },
+        {
+          "label": "المساحة",
+          "value": "75م²"
+        },
+        {
+          "label": "الموقع",
+          "value": "القنيطرة — موقع استراتيجي"
+        },
+        {
+          "label": "الواجهة",
+          "value": "واجهة مزدوجة"
+        },
+        {
+          "label": "التوجيه",
+          "value": "شرق"
+        },
+        {
+          "label": "الوضع القانوني",
+          "value": "محفظة"
+        }
+      ],
+      "lecture": [
+        "المساحة الأكبر (75م²) مع واجهة مزدوجة تمنح مرونة في التقسيم الداخلي.",
+        "الموقع الاستراتيجي قد يبرر السعر الأعلى، لكن يجب مقارنته بإيجارات المحلات المجاورة.",
+        "التوجيه الشرقي يوفر إضاءة صباحية، مناسب لأنشطة تفتح مبكراً."
+      ],
+      "note": "قراءة أولية فقط، والمعاينة الميدانية ضرورية قبل القرار.",
+      "featured": true
+    },
+    {
+      "id": "MUS-VJ-02",
+      "type": "بقعة فيلا",
+      "typeKey": "villa-plot",
+      "title": "بقعة فيلا · 350م²",
+      "price": 1200000,
+      "priceLabel": "1.200.000 درهم",
+      "city": "القنيطرة",
+      "area": "تجزئة راقية",
+      "surface": 350,
+      "image": "https://images.unsplash.com/photo-1600585154526-990dced4db54?w=1200&q=80",
+      "gallery": [
+        "https://images.unsplash.com/photo-1600585154526-990dced4db54?w=1200&q=80"
+      ],
+      "basics": [
+        {
+          "label": "نوع العقار",
+          "value": "بقعة فيلا"
+        },
+        {
+          "label": "المساحة",
+          "value": "350م²"
+        },
+        {
+          "label": "الموقع",
+          "value": "القنيطرة — تجزئة راقية"
+        },
+        {
+          "label": "عدد الواجهات",
+          "value": "واجهتان"
+        },
+        {
+          "label": "عرض الطريق",
+          "value": "15م"
+        },
+        {
+          "label": "التوجيه",
+          "value": "جنوب غرب"
+        },
+        {
+          "label": "الوضع القانوني",
+          "value": "محفظة"
+        }
+      ],
+      "lecture": [
+        "المساحة 350م² تتيح تصميم فيلا واسعة مع حديقة ومسبح محتمل.",
+        "الواجهتان تمنحان مرونة في الولوج والتوزيع، خصوصاً لفصل المدخل عن المرآب.",
+        "التوجيه الجنوب غربي يوازن بين الإضاءة والتهوية، لكن المعاينة تؤكد مدى انسجام الجوار."
+      ],
+      "note": "قراءة أولية فقط، والمعاينة الميدانية ضرورية قبل القرار.",
+      "featured": true
+    },
+    {
+      "id": "MUS-VJ-03",
+      "type": "بقعة فيلا",
+      "typeKey": "villa-plot",
+      "title": "بقعة فيلا · 386م²",
+      "price": 1720000,
+      "priceLabel": "1.720.000 درهم",
+      "city": "القنيطرة",
+      "area": "تجزئة راقية",
+      "surface": 386,
+      "image": "https://images.unsplash.com/photo-1613490493576-7fde63acd841?w=1200&q=80",
+      "gallery": [
+        "https://images.unsplash.com/photo-1613490493576-7fde63acd841?w=1200&q=80"
+      ],
+      "basics": [
+        {
+          "label": "نوع العقار",
+          "value": "بقعة فيلا"
+        },
+        {
+          "label": "المساحة",
+          "value": "386م²"
+        },
+        {
+          "label": "الموقع",
+          "value": "القنيطرة — تجزئة راقية"
+        },
+        {
+          "label": "عدد الواجهات",
+          "value": "واجهة واحدة"
+        },
+        {
+          "label": "عرض الطريق",
+          "value": "12م"
+        },
+        {
+          "label": "التوجيه",
+          "value": "شمال غرب"
+        },
+        {
+          "label": "الوضع القانوني",
+          "value": "محفظة"
+        }
+      ],
+      "lecture": [
+        "مساحة كبيرة (386م²) في تجزئة راقية، مناسبة لمشروع فيلا فخم.",
+        "التوجيه شمال غرب قد يقلل الإضاءة المباشرة في فترة بعد الزوال، ما قد يكون ميزة في الصيف.",
+        "السعر الأعلى قد يعكس قرب البقعة من مرافق التجزئة أو تميز موقعها داخل المشروع."
+      ],
+      "note": "قراءة أولية فقط، والمعاينة الميدانية ضرورية قبل القرار.",
+      "featured": true
+    },
+    {
+      "id": "MUS-APT-01",
+      "type": "شقة",
+      "typeKey": "apartment",
+      "title": "شقة عصرية · 110م²",
+      "price": 980000,
+      "priceLabel": "980.000 درهم",
+      "city": "القنيطرة",
+      "area": "حي سكني هادئ",
+      "surface": 110,
+      "image": "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=1200&q=80",
+      "gallery": [
+        "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=1200&q=80"
+      ],
+      "basics": [
+        {
+          "label": "نوع العقار",
+          "value": "شقة"
+        },
+        {
+          "label": "المساحة",
+          "value": "110م²"
+        },
+        {
+          "label": "الموقع",
+          "value": "القنيطرة — حي سكني هادئ"
+        },
+        {
+          "label": "الطابق",
+          "value": "الثاني"
+        },
+        {
+          "label": "التوجيه",
+          "value": "شرق"
+        },
+        {
+          "label": "الوضع القانوني",
+          "value": "محفظة"
+        }
+      ],
+      "lecture": [
+        "شقة بثلاث غرف محتملة على مساحة 110م²، توزيع مريح للعائلة.",
+        "التوجيه الشرقي يوفر إضاءة صباحية وتهوية جيدة.",
+        "الحي الهادئ مناسب للسكن العائلي، لكن يجب التحقق من قرب الخدمات (مدارس، نقل)."
+      ],
+      "note": "قراءة أولية فقط، والمعاينة الميدانية ضرورية قبل القرار.",
+      "featured": false
+    },
+    {
+      "id": "MUS-APT-02",
+      "type": "شقة",
+      "typeKey": "apartment",
+      "title": "شقة فاخرة · 130م²",
+      "price": 1250000,
+      "priceLabel": "1.250.000 درهم",
+      "city": "القنيطرة",
+      "area": "وسط المدينة",
+      "surface": 130,
+      "image": "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=1200&q=80",
+      "gallery": [
+        "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=1200&q=80"
+      ],
+      "basics": [
+        {
+          "label": "نوع العقار",
+          "value": "شقة"
+        },
+        {
+          "label": "المساحة",
+          "value": "130م²"
+        },
+        {
+          "label": "الموقع",
+          "value": "القنيطرة — وسط المدينة"
+        },
+        {
+          "label": "الطابق",
+          "value": "الرابع"
+        },
+        {
+          "label": "التوجيه",
+          "value": "جنوب"
+        },
+        {
+          "label": "الوضع القانوني",
+          "value": "محفظة"
+        }
+      ],
+      "lecture": [
+        "مساحة واسعة (130م²) في وسط المدينة، قريبة من الخدمات والنقل.",
+        "التوجيه الجنوبي يضمن إضاءة قوية طوال النهار، ما يقلل الحاجة للتدفئة شتاءً.",
+        "الطابق الرابع يوازن بين الهدوء والإطلالة، لكن يجب التأكد من وجود مصعد."
+      ],
+      "note": "قراءة أولية فقط، والمعاينة الميدانية ضرورية قبل القرار.",
+      "featured": false
+    },
+    {
+      "id": "MUS-VILLA-01",
+      "type": "فيلا",
+      "typeKey": "villa",
+      "title": "فيلا فاخرة · 280م²",
+      "price": 3200000,
+      "priceLabel": "3.200.000 درهم",
+      "city": "القنيطرة",
+      "area": "تجزئة راقية",
+      "surface": 280,
+      "image": "https://images.unsplash.com/photo-1564013799919-ab6000bffc1e?w=1200&q=80",
+      "gallery": [
+        "https://images.unsplash.com/photo-1564013799919-ab6000bffc1e?w=1200&q=80"
+      ],
+      "basics": [
+        {
+          "label": "نوع العقار",
+          "value": "فيلا"
+        },
+        {
+          "label": "المساحة المبنية",
+          "value": "280م²"
+        },
+        {
+          "label": "الموقع",
+          "value": "القنيطرة — تجزئة راقية"
+        },
+        {
+          "label": "الطوابق",
+          "value": "R+1"
+        },
+        {
+          "label": "الحديقة",
+          "value": "نعم — 120م²"
+        },
+        {
+          "label": "الوضع القانوني",
+          "value": "محفظة"
+        }
+      ],
+      "lecture": [
+        "فيلا مبنية بطابقين على مساحة 280م²، مع حديقة واسعة 120م².",
+        "التصميم يسمح بتوزيع الفضاء بين صالون واسع ومطبخ وغرف نوم علوية.",
+        "السعر يعكس جودة البناء والموقع؛ يجب التحقق من مواد البناء والتشطيبات ميدانياً."
+      ],
+      "note": "قراءة أولية فقط، والمعاينة الميدانية ضرورية قبل القرار.",
+      "featured": false
+    },
+    {
+      "id": "MUS-TER-01",
+      "type": "أرض فلاحية",
+      "typeKey": "agricultural",
+      "title": "أرض فلاحية · 5000م²",
+      "price": 800000,
+      "priceLabel": "800.000 درهم",
+      "city": "القنيطرة",
+      "area": "ضواحي المدينة",
+      "surface": 5000,
+      "image": "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1200&q=80",
+      "gallery": [
+        "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1200&q=80"
+      ],
+      "basics": [
+        {
+          "label": "نوع العقار",
+          "value": "أرض فلاحية"
+        },
+        {
+          "label": "المساحة",
+          "value": "5000م²"
+        },
+        {
+          "label": "الموقع",
+          "value": "القنيطرة — ضواحي المدينة"
+        },
+        {
+          "label": "الوصول للماء",
+          "value": "متوفر"
+        },
+        {
+          "label": "الوصول للكهرباء",
+          "value": "قريب"
+        },
+        {
+          "label": "الوضع القانوني",
+          "value": "ملك"
+        }
+      ],
+      "lecture": [
+        "مساحة كبيرة (5000م²) مناسبة لمشاريع فلاحية أو استثمار أرضي طويل المدى.",
+        "توفّر الماء وقرب الكهرباء يسهّلان الاستغلال الفوري.",
+        "يجب التحقق من قابلية البناء وفق الضوابط القانونية للمنطقة الفلاحية."
+      ],
+      "note": "قراءة أولية فقط، والمعاينة الميدانية ضرورية قبل القرار.",
+      "featured": false
+    },
+    {
+      "id": "MUS-MAG-03",
+      "type": "بقعة تجارية",
+      "typeKey": "commercial-plot",
+      "title": "بقعة تجارية · 104م²",
+      "price": 730000,
+      "priceLabel": "730.000 درهم",
+      "city": "القنيطرة",
+      "area": "محور تجاري",
+      "surface": 104,
+      "image": "https://images.unsplash.com/photo-1577415124269-fc1140a69e91?w=1200&q=80",
+      "gallery": [
+        "https://images.unsplash.com/photo-1577415124269-fc1140a69e91?w=1200&q=80"
+      ],
+      "basics": [
+        {
+          "label": "نوع العقار",
+          "value": "بقعة تجارية"
+        },
+        {
+          "label": "المساحة",
+          "value": "104م²"
+        },
+        {
+          "label": "الموقع",
+          "value": "القنيطرة — محور تجاري"
+        },
+        {
+          "label": "الطابق",
+          "value": "R+2"
+        },
+        {
+          "label": "التوجيه",
+          "value": "جنوب"
+        },
+        {
+          "label": "الوضع القانوني",
+          "value": "محفظة"
+        }
+      ],
+      "lecture": [
+        "بقعة تجارية بإمكانية بناء R+2، ما يتيح الجمع بين نشاط تجاري وسكنى أو مكاتب.",
+        "الموقع على محور تجاري يعزز فرص الاستثمار التجاري.",
+        "إمكانية الـR+2 ترفع القيمة الاستثمارية، لكن يجب احترام ضوابط البناء المحلية."
+      ],
+      "note": "قراءة أولية فقط، والمعاينة الميدانية ضرورية قبل القرار.",
+      "featured": false
+    }
+  ],
+  "lotissements": [
+    {
+      "id": "hadaiq-hallala",
+      "slug": "hadaiq-hallala-kenitra",
+      "title": "حدائق حلولة",
+      "city": "القنيطرة",
+      "image": "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&q=80",
+      "description": "مشروع عقاري راقٍ بضواحي القنيطرة، يضم بقع فيلا وشقق بتصميم عصري ومرافق متكاملة.",
+      "features": [
+        "بقع فيلا",
+        "شقق سكنية",
+        "مرافق متكاملة",
+        "أمن 24/7"
+      ]
+    },
+    {
+      "id": "hadika-2",
+      "slug": "hadika-2-kenitra",
+      "title": "حدائق حلولة 2",
+      "city": "القنيطرة",
+      "image": "https://images.unsplash.com/photo-1600596357905-23c75a4a8d92?w=1200&q=80",
+      "description": "المرحلة الثانية من مشروع حدائق حلولة، بمساحات أكبر وتشطيبات فاخرة.",
+      "features": [
+        "بقع فيلا واسعة",
+        "مساحات خضراء",
+        "قرب من المرافق"
+      ]
+    },
+    {
+      "id": "riad-kenitra",
+      "slug": "riad-kenitra",
+      "title": "تجزئة الرياض",
+      "city": "القنيطرة",
+      "image": "https://images.unsplash.com/photo-1613490493576-7fde63acd841?w=1200&q=80",
+      "description": "تجزئة سكنية تابعة للعمران بالقنيطرة، موجّهة للعائلات الباحثة عن هدوء وقرب من الخدمات.",
+      "features": [
+        "بقع سكنية",
+        "هدوء",
+        "قرب المدارس"
+      ]
+    }
+  ],
+  "manatiq": [
+    {
+      "slug": "centre-ville-kenitra",
+      "title": "وسط المدينة",
+      "city": "القنيطرة",
+      "image": "https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=1200&q=80",
+      "description": "قلب القنيطرة النابض: خدمات، نقل، تجارة، وقرب من الإدارات."
+    },
+    {
+      "slug": "mimouza-kenitra",
+      "title": "حي الميموزة",
+      "city": "القنيطرة",
+      "image": "https://images.unsplash.com/photo-1564013799919-ab6000bffc1e?w=1200&q=80",
+      "description": "حي سكني راقٍ معروف بهدوئه وقربه من المرافق التعليمية والتجارية."
+    },
+    {
+      "slug": "val-fleuri-kenitra",
+      "title": "فال فلوري",
+      "city": "القنيطرة",
+      "image": "https://images.unsplash.com/photo-1600585154526-990dced4db54?w=1200&q=80",
+      "description": "منطقة راقية تجمع بين الفلل الفاخرة والمساحات الخضراء الواسعة."
+    }
+  ],
+  "videos": [
+    {
+      "id": "video-01",
+      "title": "اكتشف المدينة واعرف وين تشري أرضك",
+      "description": "نصيحة مختصرة تساعدك تفهم أحياء القنيطرة قبل اتخاذ القرار.",
+      "youtubeUrl": "https://www.youtube.com/watch?v=LXb3EKWsInQ",
+      "youtubeId": "LXb3EKWsInQ",
+      "thumbnail": "https://img.youtube.com/vi/LXb3EKWsInQ/maxresdefault.jpg",
+      "duration": "04:12"
+    },
+    {
+      "id": "video-02",
+      "title": "ميزان السكن: عناوين تحتاج مراجعة قبل العرض",
+      "description": "كيف تقرأ العنوان العقاري وتفهم الوضع القانوني قبل الشراء.",
+      "youtubeUrl": "https://www.youtube.com/watch?v=2Vv-BfVoq4g",
+      "youtubeId": "2Vv-BfVoq4g",
+      "thumbnail": "https://img.youtube.com/vi/2Vv-BfVoq4g/maxresdefault.jpg",
+      "duration": "06:30"
+    },
+    {
+      "id": "video-03",
+      "title": "شقة غادي تخليك تستقر بتجزئة راقية بالقنيطرة",
+      "description": "تحليل شقة عصرية وتقييم جودة التشطيبات.",
+      "youtubeUrl": "https://www.youtube.com/watch?v=ScMzIvxBSi4",
+      "youtubeId": "ScMzIvxBSi4",
+      "thumbnail": "https://img.youtube.com/vi/ScMzIvxBSi4/maxresdefault.jpg",
+      "duration": "08:15"
+    },
+    {
+      "id": "video-04",
+      "title": "السياحة القنيطرية: جولة ميدانية تساعدك تفهم المنطقة",
+      "description": "جولة في المعالم والمرافق المحيطة بالمشاريع العقارية.",
+      "youtubeUrl": "https://www.youtube.com/watch?v=tPEE9ZwTmy0",
+      "youtubeId": "tPEE9ZwTmy0",
+      "thumbnail": "https://img.youtube.com/vi/tPEE9ZwTmy0/maxresdefault.jpg",
+      "duration": "10:45"
+    },
+    {
+      "id": "video-05",
+      "title": "المدينة الجديدة للقنيطرة: خرائط ومرافق",
+      "description": "تعرف على التوسعات العمرانية الجديدة وفرصها الاستثمارية.",
+      "youtubeUrl": "https://www.youtube.com/watch?v=RE4i2bPbZ5I",
+      "youtubeId": "RE4i2bPbZ5I",
+      "thumbnail": "https://img.youtube.com/vi/RE4i2bPbZ5I/maxresdefault.jpg",
+      "duration": "07:20"
+    },
+    {
+      "id": "video-06",
+      "title": "تجزئة ومدينة جديدة بالقنيطرة: مقارنة شاملة",
+      "description": "مقارنة بين التجزئات القديمة والجديدة من حيث السعر والخدمات.",
+      "youtubeUrl": "https://www.youtube.com/watch?v=e8M6S8GzslI",
+      "youtubeId": "e8M6S8GzslI",
+      "thumbnail": "https://img.youtube.com/vi/e8M6S8GzslI/maxresdefault.jpg",
+      "duration": "12:00"
+    }
+  ],
+  "config": {
+    "brand": {
+      "name": "MUSTAPHA IMMOBILIER",
+      "nameAr": "مصطفى للعقارات",
+      "country": "Morocco",
+      "countryAr": "المغرب",
+      "tagline": "VOTRE CLÉ VERS L’EXCEPTION",
+      "taglineAr": "مفاتيحك نحو التميّز",
+      "fullAr": "مصطفى للعقارات — المغرب"
+    },
+    "colors": {
+      "noir": "#0a0a0a",
+      "or": "#c9a14a",
+      "orClair": "#e6c87a",
+      "creme": "#f5efe0"
+    },
+    "city": "القنيطرة",
+    "cityFr": "Kénitra",
+    "contact": {
+      "phone": "+212 6 00 00 00 00",
+      "phoneHref": "+212600000000",
+      "email": "contact@mustapha-immobilier.ma",
+      "whatsapp": "+212600000000"
+    },
+    "social": {
+      "facebook": "https://www.facebook.com/",
+      "instagram": "https://www.instagram.com/",
+      "youtube": "https://www.youtube.com/",
+      "tiktok": "https://www.tiktok.com/",
+      "twitter": "https://x.com/",
+      "pinterest": "https://www.pinterest.com/",
+      "linktree": "https://linktr.ee/"
+    },
+    "lang": "ar",
+    "dir": "rtl"
+  },
+  "adminPassword": "mustapha2026",
+  "updatedAt": "2026-07-16T19:16:08.838Z"
+};
+
+export default generatedData;

@@ -68,13 +68,13 @@ export default function ImageUploader({ value, onChange, label = 'الصورة',
           urls.push(url);
         }
         const current = Array.isArray(value) ? value : [];
-        onMultipleChange([...current, ...urls]);
+        onMultipleChange([...current, ...urls.map(u => u.endsWith('/') ? u.slice(0, -1) : u)]);
       } else {
         setProgress('جارٍ تحضير الصورة...');
         const compressed = await compressImage(fileArr[0]);
         setProgress('جارٍ رفع الصورة إلى المستودع...');
         const url = await uploadImage(compressed, setProgress);
-        onChange(url);
+        onChange(url.endsWith('/') ? url.slice(0, -1) : url);
       }
     } catch (err) {
       setError(err.message || 'فشل رفع الصورة');
@@ -92,7 +92,7 @@ export default function ImageUploader({ value, onChange, label = 'الصورة',
       {/* معاينة الصورة الحالية */}
       {value && !multiple && (
         <div className="mb-2 relative rounded-lg overflow-hidden" style={{ maxWidth: '200px' }}>
-          <img src={value} alt="معاينة" className="w-full h-32 object-cover" />
+          <img src={value.endsWith('/') ? value.slice(0, -1) : value} alt="معاينة" className="w-full h-32 object-cover" />
           <button
             type="button"
             onClick={() => onChange('')}
@@ -108,7 +108,7 @@ export default function ImageUploader({ value, onChange, label = 'الصورة',
         <div className="mb-2 flex flex-wrap gap-2">
           {value.map((url, idx) => (
             <div key={idx} className="relative rounded-lg overflow-hidden" style={{ width: '80px', height: '80px' }}>
-              <img src={url} alt="" className="w-full h-full object-cover" />
+              <img src={url.endsWith('/') ? url.slice(0, -1) : url} alt="" className="w-full h-full object-cover" />
               <button
                 type="button"
                 onClick={() => onMultipleChange(value.filter((_, i) => i !== idx))}

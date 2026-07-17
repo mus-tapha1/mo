@@ -46,6 +46,9 @@ export function normalizeImageUrl(url) {
   if (/^(https?:|data:)/i.test(url)) return url;
 
   let cleanPath = url.replace(/^\//, ''); // إزالة الشرطة المائلة الأمامية إن وجدت
+  if (cleanPath.endsWith('/')) {
+    cleanPath = cleanPath.slice(0, -1); // إزالة الشرطة المائلة الزائدة في النهاية
+  }
 
   // إذا كان المسار يبدأ بـ uploads/ (بدون public/)
   if (cleanPath.startsWith('uploads/')) {

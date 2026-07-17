@@ -18,7 +18,7 @@ const nextConfig = {
   },
   env: {
     NEXT_PUBLIC_BASE_PATH: basePath,
-    NEXT_PUBLIC_GITHUB_TOKEN: process.env.SITE_GITHUB_TOKEN || '',
+    NEXT_PUBLIC_GITHUB_TOKEN: process.env.NEXT_PUBLIC_GITHUB_TOKEN || process.env.SITE_GITHUB_TOKEN || '',
   },
 };
 

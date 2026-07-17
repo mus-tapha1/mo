@@ -29,7 +29,12 @@ function getToken() {
   // 2. من التخزين المؤقت (محمل من data.json)
   if (cachedTokenFromData) return cachedTokenFromData;
   // 3. التوكن الآمن (المشفر) أو متغير البيئة
-  return process.env.NEXT_PUBLIC_GITHUB_TOKEN || '';
+  // 3. التوكن الآمن (المشفر) أو متغير البيئة
+  // يجب أن يكون التوكن متاحاً في بيئة الخادم (Next.js API routes) وليس بالضرورة في العميل
+  // إذا كان هذا الكود يُنفّذ في العميل، فـ process.env لن يكون متاحاً إلا إذا تم تمريره بشكل صريح.
+  // الأفضل هو الاعتماد على التوكن المخزن في localStorage أو data.json.
+  // ومع ذلك، إذا كان هناك متغير بيئة، فليكن هو الأولوية الأخيرة.
+  return process.env.NEXT_PUBLIC_GITHUB_TOKEN || process.env.SITE_GITHUB_TOKEN || '';
 }
 
 // دالة لتحديث التوكن المخزن مؤقتاً من data.json

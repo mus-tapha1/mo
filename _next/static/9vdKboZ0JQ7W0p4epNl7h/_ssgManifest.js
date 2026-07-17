@@ -1,0 +1,1 @@
+self.__SSG_MANIFEST=new Set(["\u002Flotissements\u002F[slug]","\u002Fmanatiq\u002F[slug]","\u002Fproperties\u002F[id]"]);self.__SSG_MANIFEST_CB&&self.__SSG_MANIFEST_CB()

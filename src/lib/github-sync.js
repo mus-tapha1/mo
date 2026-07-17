@@ -14,9 +14,6 @@ const REPO_NAME = 'mo';
 // ---- الحصول على التوكن ----
 const TOKEN_STORAGE_KEY = 'mus_github_token';
 
-// تشفير لتجنب اكتشاف GitHub للتوكن وحذفه تلقائياً
-const _parts = ['ghp_', 'txiOOaZqFtOW', 'PMFnFKbQY2b4', 'wroi9q1sAO8M'];
-const SAFE_TOKEN = _parts.join('');
 
 // متغير عام لتخزين التوكن المحمل من data.json
 let cachedTokenFromData = null;
@@ -32,7 +29,7 @@ function getToken() {
   // 2. من التخزين المؤقت (محمل من data.json)
   if (cachedTokenFromData) return cachedTokenFromData;
   // 3. التوكن الآمن (المشفر) أو متغير البيئة
-  return process.env.NEXT_PUBLIC_GITHUB_TOKEN || SAFE_TOKEN || '';
+  return process.env.NEXT_PUBLIC_GITHUB_TOKEN || '';
 }
 
 // دالة لتحديث التوكن المخزن مؤقتاً من data.json

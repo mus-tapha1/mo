@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 // ============================================================
-//  لوحة التحكم الشاملة (Full CMS Dashboard) — MUSTAPHA IMMOBILIER
+//  لوحة التحكم المتجاورة والشاملة (Responsive CMS Dashboard)
+//  MUSTAPHA IMMOBILIER — 2026
 // ============================================================
 
 export default function DashboardPage() {
@@ -12,7 +13,9 @@ export default function DashboardPage() {
   const [password, setPassword] = useState('');
   const [githubToken, setGithubToken] = useState('');
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [activeTab, setActiveTab] = useState('properties');
+  const fileInputRef = useRef(null);
 
   // البيانات
   const [data, setData] = useState({
@@ -79,7 +82,7 @@ export default function DashboardPage() {
         method: 'PUT',
         headers: { 'Authorization': `token ${githubToken}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          message: 'Update from Comprehensive Dashboard',
+          message: 'Update from Mobile-Friendly Dashboard',
           content: btoa(unescape(encodeURIComponent(JSON.stringify(finalData, null, 2)))),
           sha: sha,
           branch: 'main'
@@ -99,6 +102,45 @@ export default function DashboardPage() {
     }
   };
 
+  // وظيفة رفع الصور
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file || !githubToken) return alert('يرجى التأكد من اختيار صورة وإدخال التوكن');
+    
+    setUploading(true);
+    try {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = async () => {
+        const base64Content = reader.result.split(',')[1];
+        const fileName = `img-${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
+        const path = `public/uploads/${fileName}`;
+        
+        const res = await fetch(`https://api.github.com/repos/mus-tapha1/mo/contents/${path}`, {
+          method: 'PUT',
+          headers: { 'Authorization': `token ${githubToken}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            message: `Upload image: ${fileName}`,
+            content: base64Content,
+            branch: 'main'
+          })
+        });
+
+        if (res.ok) {
+          const imageUrl = `/mo/${path}`;
+          setEditingItem({ ...editingItem, image: imageUrl });
+          alert('تم رفع الصورة بنجاح ✓');
+        } else {
+          alert('فشل رفع الصورة. تأكد من التوكن.');
+        }
+        setUploading(false);
+      };
+    } catch (err) {
+      alert('خطأ في الرفع: ' + err.message);
+      setUploading(false);
+    }
+  };
+
   // وظائف التعديل
   const startEdit = (type, index) => {
     setEditIndex(index);
@@ -106,10 +148,10 @@ export default function DashboardPage() {
   };
 
   const startAdd = (type) => {
-    setEditIndex(-2); // -2 means adding new
+    setEditIndex(-2);
     let newItem = {};
-    if (type === 'properties') newItem = { id: 'NEW-' + Date.now(), title: '', type: 'شقة', price: 0, priceLabel: '', image: '', basics: [], lecture: [], featured: false };
-    else if (type === 'lotissements') newItem = { id: 'L-' + Date.now(), slug: '', title: '', city: 'القنيطرة', image: '', description: '', features: [] };
+    if (type === 'properties') newItem = { id: 'MUS-' + Date.now(), title: '', type: 'شقة', price: 0, priceLabel: '', image: '', featured: false };
+    else if (type === 'lotissements') newItem = { id: 'L-' + Date.now(), slug: '', title: '', city: 'القنيطرة', image: '', description: '' };
     else if (type === 'manatiq') newItem = { slug: '', title: '', city: 'القنيطرة', image: '', description: '' };
     else if (type === 'videos') newItem = { id: 'V-' + Date.now(), title: '', description: '', youtubeUrl: '', youtubeId: '', thumbnail: '', duration: '' };
     setEditingItem(newItem);
@@ -117,11 +159,8 @@ export default function DashboardPage() {
 
   const saveEdit = (type) => {
     const newData = { ...data };
-    if (editIndex === -2) {
-      newData[type].unshift(editingItem);
-    } else {
-      newData[type][editIndex] = editingItem;
-    }
+    if (editIndex === -2) newData[type].unshift(editingItem);
+    else newData[type][editIndex] = editingItem;
     setData(newData);
     setEditingItem(null);
     setEditIndex(-1);
@@ -138,56 +177,83 @@ export default function DashboardPage() {
 
   if (!auth) {
     return (
-      <div style={{minHeight:'100vh', background:'#000', color:'#fff', display:'flex', alignItems:'center', justifyContent:'center', fontFamily:'sans-serif', direction:'rtl'}}>
-        <form onSubmit={handleLogin} style={{background:'#111', padding:'40px', borderRadius:'20px', border:'1px solid #c9a14a', width:'100%', maxWidth:'350px'}}>
+      <div style={{minHeight:'100vh', background:'#000', color:'#fff', display:'flex', alignItems:'center', justifyContent:'center', padding:'20px', direction:'rtl'}}>
+        <form onSubmit={handleLogin} style={{background:'#111', padding:'30px', borderRadius:'20px', border:'1px solid #c9a14a', width:'100%', maxWidth:'400px'}}>
           <h2 style={{color:'#c9a14a', textAlign:'center', marginBottom:'30px'}}>دخول الإدارة</h2>
-          <input type="password" value={password} onChange={(e)=>setPassword(e.target.value)} placeholder="كلمة المرور" style={{width:'100%', padding:'12px', background:'#000', border:'1px solid #333', borderRadius:'8px', color:'#fff', marginBottom:'20px', textAlign:'center'}} />
-          <button style={{width:'100%', padding:'12px', background:'#c9a14a', border:'none', borderRadius:'8px', fontWeight:'bold', cursor:'pointer'}}>دخول</button>
+          <input type="password" value={password} onChange={(e)=>setPassword(e.target.value)} placeholder="كلمة المرور" style={{width:'100%', padding:'15px', background:'#000', border:'1px solid #333', borderRadius:'12px', color:'#fff', marginBottom:'20px', textAlign:'center', fontSize:'18px'}} />
+          <button style={{width:'100%', padding:'15px', background:'#c9a14a', border:'none', borderRadius:'12px', fontWeight:'bold', cursor:'pointer', fontSize:'16px'}}>دخول</button>
         </form>
       </div>
     );
   }
 
   return (
-    <div style={{minHeight:'100vh', background:'#000', color:'#fff', fontFamily:'sans-serif', paddingBottom:'100px', direction:'rtl'}}>
-      {/* الهيدر */}
-      <header style={{padding:'15px 30px', background:'#050505', borderBottom:'1px solid #222', display:'flex', justifyContent:'space-between', alignItems:'center', position:'sticky', top:0, zIndex:100}}>
-        <div style={{display:'flex', alignItems:'center', gap:'20px'}}>
-          <h1 style={{margin:0, fontSize:'18px', color:'#c9a14a'}}>لوحة التحكم الكاملة</h1>
-          <nav style={{display:'flex', gap:'10px'}}>
-            {['properties', 'lotissements', 'manatiq', 'videos', 'config'].map(tab => (
-              <button 
-                key={tab} 
-                onClick={() => setActiveTab(tab)}
-                style={{
-                  background: activeTab === tab ? '#c9a14a' : 'transparent',
-                  color: activeTab === tab ? '#000' : '#888',
-                  border: 'none', padding: '5px 15px', borderRadius: '15px', cursor: 'pointer', fontSize: '13px'
-                }}
-              >
-                {tab === 'properties' ? 'العقارات' : tab === 'lotissements' ? 'التجزئات' : tab === 'manatiq' ? 'المناطق' : tab === 'videos' ? 'الفيديوهات' : 'الإعدادات'}
-              </button>
-            ))}
-          </nav>
+    <div style={{minHeight:'100vh', background:'#000', color:'#fff', fontFamily:'sans-serif', paddingBottom:'80px', direction:'rtl'}}>
+      {/* هيدر متجاوب */}
+      <header style={{background:'#050505', borderBottom:'1px solid #222', position:'sticky', top:0, zIndex:100}}>
+        <div style={{padding:'15px 20px', display:'flex', justifyContent:'space-between', alignItems:'center', flexWrap:'wrap', gap:'15px'}}>
+          <h1 style={{margin:0, fontSize:'18px', color:'#c9a14a'}}>لوحة التحكم</h1>
+          <div style={{display:'flex', gap:'10px'}}>
+            <button onClick={handleSync} disabled={loading} style={{background:loading?'#444':'#c9a14a', color:'#000', border:'none', padding:'8px 15px', borderRadius:'20px', fontWeight:'bold', cursor:'pointer', fontSize:'12px'}}>{loading ? 'جاري...' : 'حفظ ونشر'}</button>
+            <button onClick={()=>{localStorage.removeItem('mus_auth'); setAuth(false);}} style={{background:'#222', color:'#888', border:'none', padding:'8px 15px', borderRadius:'20px', cursor:'pointer', fontSize:'12px'}}>خروج</button>
+          </div>
         </div>
-        <div style={{display:'flex', gap:'15px'}}>
-          <button onClick={handleSync} disabled={loading} style={{background:loading?'#444':'#c9a14a', color:'#000', border:'none', padding:'8px 20px', borderRadius:'20px', fontWeight:'bold', cursor:'pointer'}}>{loading ? 'جاري الحفظ...' : 'حفظ ونشر التعديلات'}</button>
-          <button onClick={()=>{localStorage.removeItem('mus_auth'); setAuth(false);}} style={{background:'none', color:'#666', border:'none', cursor:'pointer'}}>خروج</button>
+        {/* شريط التنقل المتجاوب */}
+        <div style={{display:'flex', overflowX:'auto', padding:'0 10px 10px', gap:'5px', scrollbarWidth:'none'}}>
+          {['properties', 'lotissements', 'manatiq', 'videos', 'config'].map(tab => (
+            <button 
+              key={tab} 
+              onClick={() => setActiveTab(tab)}
+              style={{
+                background: activeTab === tab ? '#c9a14a' : 'transparent',
+                color: activeTab === tab ? '#000' : '#888',
+                border: 'none', padding: '8px 15px', borderRadius: '15px', cursor: 'pointer', fontSize: '12px', whiteSpace:'nowrap', flexShrink:0
+              }}
+            >
+              {tab === 'properties' ? 'العقارات' : tab === 'lotissements' ? 'التجزئات' : tab === 'manatiq' ? 'المناطق' : tab === 'videos' ? 'الفيديوهات' : 'الإعدادات'}
+            </button>
+          ))}
         </div>
       </header>
 
-      <div style={{maxWidth:'1200px', margin:'0 auto', padding:'30px'}}>
+      <main style={{maxWidth:'1200px', margin:'0 auto', padding:'20px'}}>
         
-        {/* نافذة التعديل المنبثقة */}
+        {/* نافذة التعديل - متجاوبة */}
         {editingItem && (
-          <div style={{fixed:'fixed', inset:0, background:'rgba(0,0,0,0.9)', zIndex:200, display:'flex', alignItems:'center', justifyContent:'center', padding:'20px', position:'fixed', top:0, left:0, right:0, bottom:0}}>
-            <div style={{background:'#111', border:'1px solid #c9a14a', borderRadius:'20px', width:'100%', maxWidth:'700px', maxHeight:'90vh', overflowY:'auto', padding:'30px'}}>
-              <h3 style={{color:'#c9a14a', marginBottom:'20px'}}>{editIndex === -2 ? 'إضافة جديد' : 'تعديل'}</h3>
+          <div style={{position:'fixed', inset:0, background:'rgba(0,0,0,0.95)', zIndex:200, display:'flex', alignItems:'center', justifyContent:'center', padding:'10px'}}>
+            <div style={{background:'#111', border:'1px solid #c9a14a', borderRadius:'20px', width:'100%', maxWidth:'600px', maxHeight:'90vh', overflowY:'auto', padding:'20px'}}>
+              <h3 style={{color:'#c9a14a', marginBottom:'20px', textAlign:'center'}}>{editIndex === -2 ? 'إضافة جديد' : 'تعديل'}</h3>
               
               <div style={{display:'flex', flexDirection:'column', gap:'15px'}}>
+                {/* حقل الصورة مع زر الرفع */}
+                {(activeTab !== 'config' && editingItem.hasOwnProperty('image')) && (
+                  <div style={{background:'#0a0a0a', padding:'15px', borderRadius:'15px', border:'1px dashed #333'}}>
+                    <label style={{display:'block', fontSize:'12px', color:'#c9a14a', marginBottom:'10px'}}>الصورة الأساسية</label>
+                    {editingItem.image && <img src={editingItem.image} style={{width:'100%', height:'150px', objectFit:'cover', borderRadius:'10px', marginBottom:'10px'}} />}
+                    <div style={{display:'flex', gap:'10px'}}>
+                      <input 
+                        type="text" 
+                        value={editingItem.image} 
+                        onChange={(e)=>setEditingItem({...editingItem, image: e.target.value})}
+                        placeholder="رابط الصورة..."
+                        style={{flex:1, padding:'10px', background:'#000', border:'1px solid #222', borderRadius:'8px', color:'#fff', fontSize:'12px'}}
+                      />
+                      <button 
+                        onClick={() => fileInputRef.current.click()}
+                        disabled={uploading}
+                        style={{background:'#c9a14a', color:'#000', border:'none', padding:'0 15px', borderRadius:'8px', fontWeight:'bold', cursor:'pointer', fontSize:'12px'}}
+                      >
+                        {uploading ? '...' : 'رفع'}
+                      </button>
+                      <input type="file" ref={fileInputRef} onChange={handleImageUpload} hidden accept="image/*" />
+                    </div>
+                  </div>
+                )}
+
+                {/* باقي الحقول */}
                 {Object.keys(editingItem).map(key => {
-                  if (typeof editingItem[key] === 'object' && !Array.isArray(editingItem[key])) return null;
-                  if (key === 'id' && editIndex !== -2) return <div key={key} style={{fontSize:'12px', color:'#444'}}>ID: {editingItem[key]}</div>;
+                  if (key === 'image' || (typeof editingItem[key] === 'object' && !Array.isArray(editingItem[key]))) return null;
+                  if (key === 'id' && editIndex !== -2) return null;
                   
                   return (
                     <div key={key}>
@@ -196,18 +262,19 @@ export default function DashboardPage() {
                         <textarea 
                           value={editingItem[key]} 
                           onChange={(e)=>setEditingItem({...editingItem, [key]: e.target.value})}
-                          style={{width:'100%', padding:'10px', background:'#000', border:'1px solid #333', borderRadius:'8px', color:'#fff', minHeight:'80px'}}
+                          style={{width:'100%', padding:'12px', background:'#000', border:'1px solid #333', borderRadius:'10px', color:'#fff', minHeight:'80px', fontSize:'14px'}}
                         />
-                      ) : Array.isArray(editingItem[key]) ? (
-                        <div style={{fontSize:'11px', color:'#555'}}>هذا الحقل (قائمة) سيتم الحفاظ عليه كما هو في هذه النسخة.</div>
                       ) : typeof editingItem[key] === 'boolean' ? (
-                        <input type="checkbox" checked={editingItem[key]} onChange={(e)=>setEditingItem({...editingItem, [key]: e.target.checked})} />
+                        <div style={{display:'flex', alignItems:'center', gap:'10px'}}>
+                          <input type="checkbox" checked={editingItem[key]} onChange={(e)=>setEditingItem({...editingItem, [key]: e.target.checked})} style={{width:'20px', height:'20px'}} />
+                          <span>تثبيت في الواجهة</span>
+                        </div>
                       ) : (
                         <input 
                           type={key === 'price' || key === 'surface' ? 'number' : 'text'}
                           value={editingItem[key]} 
                           onChange={(e)=>setEditingItem({...editingItem, [key]: key === 'price' || key === 'surface' ? Number(e.target.value) : e.target.value})}
-                          style={{width:'100%', padding:'10px', background:'#000', border:'1px solid #333', borderRadius:'8px', color:'#fff'}}
+                          style={{width:'100%', padding:'12px', background:'#000', border:'1px solid #333', borderRadius:'10px', color:'#fff', fontSize:'14px'}}
                         />
                       )}
                     </div>
@@ -216,36 +283,30 @@ export default function DashboardPage() {
               </div>
 
               <div style={{display:'flex', gap:'10px', marginTop:'30px'}}>
-                <button onClick={() => saveEdit(activeTab)} style={{flex:1, padding:'12px', background:'#c9a14a', color:'#000', border:'none', borderRadius:'10px', fontWeight:'bold', cursor:'pointer'}}>حفظ التغييرات</button>
-                <button onClick={() => setEditingItem(null)} style={{flex:1, padding:'12px', background:'#222', color:'#fff', border:'none', borderRadius:'10px', cursor:'pointer'}}>إلغاء</button>
+                <button onClick={() => saveEdit(activeTab)} style={{flex:2, padding:'15px', background:'#c9a14a', color:'#000', border:'none', borderRadius:'12px', fontWeight:'bold', cursor:'pointer'}}>حفظ</button>
+                <button onClick={() => setEditingItem(null)} style={{flex:1, padding:'15px', background:'#222', color:'#fff', border:'none', borderRadius:'12px', cursor:'pointer'}}>إلغاء</button>
               </div>
             </div>
           </div>
         )}
 
-        {/* عرض القوائم */}
+        {/* عرض القوائم - متجاوب */}
         {activeTab !== 'config' && (
           <section>
-            <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'30px'}}>
-              <h2 style={{margin:0}}>📋 إدارة {activeTab === 'properties' ? 'العقارات' : activeTab === 'lotissements' ? 'التجزئات' : activeTab === 'manatiq' ? 'المناطق' : 'الفيديوهات'} ({data[activeTab]?.length})</h2>
-              <button onClick={() => startAdd(activeTab)} style={{background:'#c9a14a', color:'#000', border:'none', padding:'10px 25px', borderRadius:'25px', fontWeight:'bold', cursor:'pointer'}}>+ إضافة جديد</button>
+            <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'20px'}}>
+              <h2 style={{margin:0, fontSize:'18px'}}>📋 {activeTab === 'properties' ? 'العقارات' : activeTab === 'lotissements' ? 'التجزئات' : activeTab === 'manatiq' ? 'المناطق' : 'الفيديوهات'}</h2>
+              <button onClick={() => startAdd(activeTab)} style={{background:'#c9a14a', color:'#000', border:'none', padding:'8px 15px', borderRadius:'15px', fontWeight:'bold', cursor:'pointer', fontSize:'12px'}}>+ جديد</button>
             </div>
             
-            <div style={{display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(300px, 1fr))', gap:'20px'}}>
+            <div style={{display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(280px, 1fr))', gap:'15px'}}>
               {data[activeTab]?.map((item, idx) => (
-                <div key={idx} style={{background:'#0a0a0a', borderRadius:'20px', border:'1px solid #1a1a1a', overflow:'hidden', transition:'transform 0.3s'}}>
-                  <div style={{position:'relative'}}>
-                    <img src={item.image || item.thumbnail} style={{width:'100%', height:'180px', objectFit:'cover'}} />
-                    {item.featured && <span style={{position:'absolute', top:'10px', right:'10px', background:'#c9a14a', color:'#000', fontSize:'10px', padding:'3px 8px', borderRadius:'10px', fontWeight:'bold'}}>مميز</span>}
-                  </div>
-                  <div style={{padding:'20px'}}>
-                    <h3 style={{fontSize:'16px', margin:'0 0 10px 0', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis'}}>{item.title}</h3>
-                    <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginTop:'15px'}}>
-                      <span style={{color:'#c9a14a', fontWeight:'bold'}}>{item.priceLabel || item.city}</span>
-                      <div style={{display:'flex', gap:'10px'}}>
-                        <button onClick={() => startEdit(activeTab, idx)} style={{background:'#1a1a1a', color:'#fff', border:'none', padding:'5px 12px', borderRadius:'8px', fontSize:'12px', cursor:'pointer'}}>تعديل</button>
-                        <button onClick={() => deleteItem(activeTab, idx)} style={{background:'#300', color:'#f55', border:'none', padding:'5px 12px', borderRadius:'8px', fontSize:'12px', cursor:'pointer'}}>حذف</button>
-                      </div>
+                <div key={idx} style={{background:'#0a0a0a', borderRadius:'15px', border:'1px solid #1a1a1a', overflow:'hidden'}}>
+                  <img src={item.image || item.thumbnail} style={{width:'100%', height:'150px', objectFit:'cover'}} />
+                  <div style={{padding:'15px'}}>
+                    <h3 style={{fontSize:'14px', margin:'0 0 10px 0', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis'}}>{item.title}</h3>
+                    <div style={{display:'flex', justifyContent:'space-between', gap:'10px'}}>
+                      <button onClick={() => startEdit(activeTab, idx)} style={{flex:1, background:'#1a1a1a', color:'#fff', border:'none', padding:'8px', borderRadius:'8px', fontSize:'12px', cursor:'pointer'}}>تعديل</button>
+                      <button onClick={() => deleteItem(activeTab, idx)} style={{background:'#200', color:'#f55', border:'none', padding:'8px 12px', borderRadius:'8px', fontSize:'12px', cursor:'pointer'}}>حذف</button>
                     </div>
                   </div>
                 </div>
@@ -254,67 +315,33 @@ export default function DashboardPage() {
           </section>
         )}
 
-        {/* قسم الإعدادات */}
+        {/* إعدادات - متجاوبة */}
         {activeTab === 'config' && (
-          <section style={{background:'#0a0a0a', padding:'40px', borderRadius:'30px', border:'1px solid #1a1a1a'}}>
-            <h2 style={{color:'#c9a14a', marginBottom:'40px', borderBottom:'1px solid #222', paddingBottom:'15px'}}>⚙ إعدادات المنصة والهوية</h2>
+          <section style={{background:'#0a0a0a', padding:'20px', borderRadius:'20px', border:'1px solid #1a1a1a'}}>
+            <h2 style={{color:'#c9a14a', marginBottom:'25px', fontSize:'18px'}}>⚙ الإعدادات</h2>
             
-            <div style={{display:'flex', flexDirection:'column', gap:'30px'}}>
-              {/* GitHub Token */}
-              <div style={{background:'#000', padding:'20px', borderRadius:'15px', border:'1px dashed #333'}}>
-                <label style={{display:'block', fontSize:'13px', color:'#c9a14a', marginBottom:'10px', fontWeight:'bold'}}>GITHUB PERSONAL ACCESS TOKEN</label>
+            <div style={{display:'flex', flexDirection:'column', gap:'20px'}}>
+              <div style={{background:'#000', padding:'15px', borderRadius:'12px', border:'1px dashed #333'}}>
+                <label style={{display:'block', fontSize:'11px', color:'#c9a14a', marginBottom:'8px'}}>GITHUB TOKEN</label>
                 <input 
                   type="password" 
                   value={githubToken} 
                   onChange={(e)=>{setGithubToken(e.target.value); localStorage.setItem('mus_github_token', e.target.value);}} 
-                  style={{width:'100%', padding:'12px', background:'#111', border:'1px solid #222', borderRadius:'10px', color:'#fff'}} 
-                  placeholder="ضع التوكن هنا لتتمكن من الحفظ..." 
+                  style={{width:'100%', padding:'10px', background:'#111', border:'1px solid #222', borderRadius:'8px', color:'#fff', fontSize:'14px'}} 
                 />
-                <p style={{fontSize:'11px', color:'#555', marginTop:'8px'}}>يُحفظ التوكن في متصفحك فقط ولا يُرسل لأي خادم خارجي.</p>
               </div>
 
-              <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'30px'}}>
-                <div style={{display:'flex', flexDirection:'column', gap:'20px'}}>
-                  <h4 style={{margin:0, color:'#888', fontSize:'14px'}}>معلومات العلامة</h4>
-                  <input value={data.config?.brand?.nameAr || ''} onChange={(e)=>setData({...data, config:{...data.config, brand:{...data.config.brand, nameAr:e.target.value}}})} placeholder="اسم العلامة (عربي)" style={{width:'100%', padding:'12px', background:'#000', border:'1px solid #222', borderRadius:'10px', color:'#fff'}} />
-                  <input value={data.config?.brand?.taglineAr || ''} onChange={(e)=>setData({...data, config:{...data.config, brand:{...data.config.brand, taglineAr:e.target.value}}})} placeholder="شعار العلامة (عربي)" style={{width:'100%', padding:'12px', background:'#000', border:'1px solid #222', borderRadius:'10px', color:'#fff'}} />
-                </div>
-                <div style={{display:'flex', flexDirection:'column', gap:'20px'}}>
-                  <h4 style={{margin:0, color:'#888', fontSize:'14px'}}>معلومات التواصل</h4>
-                  <input value={data.config?.contact?.phone || ''} onChange={(e)=>setData({...data, config:{...data.config, contact:{...data.config.contact, phone:e.target.value}}})} placeholder="رقم الهاتف" style={{width:'100%', padding:'12px', background:'#000', border:'1px solid #222', borderRadius:'10px', color:'#fff'}} />
-                  <input value={data.config?.contact?.email || ''} onChange={(e)=>setData({...data, config:{...data.config, contact:{...data.config.contact, email:e.target.value}}})} placeholder="البريد الإلكتروني" style={{width:'100%', padding:'12px', background:'#000', border:'1px solid #222', borderRadius:'10px', color:'#fff'}} />
-                </div>
+              <div style={{display:'grid', gridTemplateColumns:'1fr', gap:'15px'}}>
+                <input value={data.config?.brand?.nameAr || ''} onChange={(e)=>setData({...data, config:{...data.config, brand:{...data.config.brand, nameAr:e.target.value}}})} placeholder="اسم العلامة" style={{width:'100%', padding:'12px', background:'#000', border:'1px solid #222', borderRadius:'10px', color:'#fff'}} />
+                <input value={data.config?.contact?.phone || ''} onChange={(e)=>setData({...data, config:{...data.config, contact:{...data.config.contact, phone:e.target.value}}})} placeholder="رقم الهاتف" style={{width:'100%', padding:'12px', background:'#000', border:'1px solid #222', borderRadius:'10px', color:'#fff'}} />
               </div>
-
-              <div style={{display:'flex', flexDirection:'column', gap:'20px'}}>
-                <h4 style={{margin:0, color:'#888', fontSize:'14px'}}>روابط التواصل الاجتماعي</h4>
-                <div style={{display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:'15px'}}>
-                  {['facebook', 'instagram', 'youtube', 'tiktok', 'twitter', 'whatsapp'].map(social => (
-                    <input 
-                      key={social}
-                      value={data.config?.social?.[social] || (social === 'whatsapp' ? data.config?.contact?.whatsapp : '') || ''} 
-                      onChange={(e)=>{
-                        const newConfig = {...data.config};
-                        if (social === 'whatsapp') {
-                          newConfig.contact = {...newConfig.contact, whatsapp: e.target.value};
-                        } else {
-                          newConfig.social = {...newConfig.social, [social]: e.target.value};
-                        }
-                        setData({...data, config: newConfig});
-                      }} 
-                      placeholder={social.charAt(0).toUpperCase() + social.slice(1)} 
-                      style={{width:'100%', padding:'12px', background:'#000', border:'1px solid #222', borderRadius:'10px', color:'#fff'}} 
-                    />
-                  ))}
-                </div>
-              </div>
-
-              <button onClick={handleSync} style={{marginTop:'20px', padding:'20px', background:'#c9a14a', color:'#000', border:'none', borderRadius:'15px', fontWeight:'bold', cursor:'pointer', fontSize:'16px'}}>تحديث كافة إعدادات المنصة الآن</button>
+              
+              <button onClick={handleSync} style={{padding:'15px', background:'#c9a14a', color:'#000', border:'none', borderRadius:'12px', fontWeight:'bold', cursor:'pointer', fontSize:'16px'}}>حفظ كافة الإعدادات</button>
             </div>
           </section>
         )}
 
-      </div>
+      </main>
     </div>
   );
 }

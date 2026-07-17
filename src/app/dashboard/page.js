@@ -124,20 +124,40 @@ export default function DashboardPage() {
   }
 
   // ── رفع ملف صورة إلى GitHub ─────────────────
-  async function githubUploadFile(path, b64, name) {
+  // ── توليد اسم فريد للصورة ───────────────────
+  let _uploadCounter = 0;
+  function uniqueImgName() {
+    _uploadCounter += 1;
+    const ts   = Date.now().toString(36);
+    const rand = Math.random().toString(36).slice(2, 10); // 8 حروف عشوائية
+    const seq  = _uploadCounter.toString(36).padStart(3, '0');
+    return `img-${ts}-${seq}-${rand}.jpg`;
+  }
+
+  // ── رفع ملف واحد إلى GitHub مع إعادة المحاولة ─
+  async function githubUploadFile(path, b64, name, retries = 3) {
     const tok = localStorage.getItem('mus_github_token') || token;
     if (!tok) throw new Error('يرجى إدخال GitHub Token في الإعدادات أولاً');
-    const resp = await fetch(`${API_BASE}/contents/${path}`, {
-      method: 'PUT',
-      headers: { Authorization: `token ${tok}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: `Upload: ${name}`, content: b64, branch: 'main' }),
-    });
-    if (!resp.ok) {
+    for (let attempt = 1; attempt <= retries; attempt++) {
+      const resp = await fetch(`${API_BASE}/contents/${path}`, {
+        method: 'PUT',
+        headers: { Authorization: `token ${tok}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: `Upload: ${name}`, content: b64, branch: 'main' }),
+      });
+      if (resp.ok) return resp;
+
       let reason = `HTTP ${resp.status}`;
       try { const j = await resp.json(); reason = j.message || reason; } catch {}
+
+      // إذا كان خطأ معدل الطلبات — انتظر ثم أعد المحاولة
+      if ((resp.status === 403 || resp.status === 429) && attempt < retries) {
+        const wait = attempt * 2000; // 2 ث، 4 ث
+        setUploadPct(`تجاوز حد GitHub — إعادة المحاولة بعد ${wait/1000}ث...`);
+        await new Promise(r => setTimeout(r, wait));
+        continue;
+      }
       throw new Error(reason);
     }
-    return resp;
   }
 
   // ── رفع صورة واحدة ──────────────────────────
@@ -147,15 +167,14 @@ export default function DashboardPage() {
     setSyncStatus('uploading'); setUploadPct('جارٍ ضغط الصورة...');
     try {
       const compressed = await compressImage(file);
-      const rand = Math.random().toString(36).slice(2, 7);
-      const name = `img-${Date.now().toString(36)}-${rand}.jpg`;
+      const name = uniqueImgName();
       const path = `public/uploads/${name}`;
       const b64  = await fileToBase64(compressed);
       setUploadPct('جارٍ الرفع إلى GitHub...');
       await githubUploadFile(path, b64, name);
       const url = `${RAW_BASE}/${path}`;
       setModal(m => ({ ...m, item: { ...m.item, [field]: url } }));
-      showStatus('ok', '✓ تم رفع الصورة — اضغط "حفظ ونشر" لإرسالها للموقع');
+      showStatus('ok', '✓ تم رفع الصورة — اضغط حفظ لإرسالها للموقع');
     } catch (err) {
       showStatus('error', `فشل الرفع: ${err.message}`);
     } finally {
@@ -172,8 +191,10 @@ export default function DashboardPage() {
       setSyncStatus('uploading');
       setUploadPct(`ضغط وإرسال ${i + 1} من ${files.length}...`);
       try {
+        // انتظر ثانية بين كل رفع لتجنب حد معدل GitHub
+        if (i > 0) await new Promise(r => setTimeout(r, 1200));
         const compressed = await compressImage(files[i]);
-        const name = `img-${Date.now().toString(36)}-${Math.random().toString(36).slice(2,6)}.jpg`;
+        const name = uniqueImgName();
         const path = `public/uploads/${name}`;
         const b64  = await fileToBase64(compressed);
         await githubUploadFile(path, b64, name);

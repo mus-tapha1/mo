@@ -162,7 +162,7 @@ function Toast({ message, show, isError = false }) {
 }
 
 // ============================================================
-//  مؤشر حالة المزامنة
+//  مؤشر حالة المزامنة — النشر فوري بدون بناء
 // ============================================================
 function SyncStatus({ onSync, onPull, lastSync }) {
   const [actionsStatus, setActionsStatus] = useState(null);
@@ -181,13 +181,15 @@ function SyncStatus({ onSync, onPull, lastSync }) {
     pollActions();
   }, [lastSync]); // eslint-disable-line
 
+  // النشر من لوحة التحكم فوري (يحدّث data.json مباشرة) — لا يحتاج بناء
+  // البناء يحدث فقط عند تغيير الكود نفسه (وليس البيانات/الصور)
   const statusInfo = actionsStatus
     ? actionsStatus.status === 'completed' && actionsStatus.conclusion === 'success'
-      ? { text: 'النشر مكتمل ✓', color: 'text-green-400', bg: 'bg-green-500/10 border-green-500/20' }
+      ? { text: 'الموقع محدّث ✓', color: 'text-green-400', bg: 'bg-green-500/10 border-green-500/20' }
       : actionsStatus.status === 'in_progress' || actionsStatus.status === 'queued'
-      ? { text: 'جاري النشر... ⏳', color: 'text-or', bg: 'bg-or/10 border-or/20' }
-      : { text: 'فشل النشر ✗', color: 'text-red-400', bg: 'bg-red-500/10 border-red-500/20' }
-    : { text: 'متصل ✓', color: 'text-green-400', bg: 'bg-green-500/10 border-green-500/20' };
+      ? { text: 'جاري تحديث الموقع... ⏳', color: 'text-or', bg: 'bg-or/10 border-or/20' }
+      : { text: 'البيانات منشورة ✓ (لا حاجة للبناء)', color: 'text-green-400', bg: 'bg-green-500/10 border-green-500/20' }
+    : { text: 'النشر فوري — بدون بناء ✓', color: 'text-green-400', bg: 'bg-green-500/10 border-green-500/20' };
 
   return (
     <div className={`rounded-lg p-3 text-xs ${statusInfo.bg} border ${statusInfo.color}`}>
@@ -198,6 +200,9 @@ function SyncStatus({ onSync, onPull, lastSync }) {
           <button onClick={onSync} className="underline hover:no-underline opacity-80">نشر</button>
         </div>
       </div>
+      <p className="mt-1.5 opacity-70 text-[10px] leading-relaxed">
+        💡 النشر فوري: التغييرات تظهر على الموقع مباشرة بدون إعادة بناء. البيانات تُقرأ من GitHub حيّاً.
+      </p>
     </div>
   );
 }

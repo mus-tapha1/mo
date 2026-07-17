@@ -4,9 +4,14 @@ import Link from 'next/link';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Reveal from '@/components/Reveal';
-import { lotissements as lotissementsDefault } from '@/data/lotissements';
+import { useLiveData } from '@/lib/use-live-data';
+import { getFallbackLotissements } from '@/lib/live-data';
 
 export default function LotissementsPage() {
+  // جلب البيانات الحيّة من GitHub — تظهر التغييرات فوراً بدون بناء
+  const { data: liveData } = useLiveData();
+  const lotissements = liveData.lotissements || getFallbackLotissements();
+
   return (
     <>
       <Header />
@@ -27,8 +32,8 @@ export default function LotissementsPage() {
 
       <section className="py-16 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {lotissementsDefault.map((lot, i) => (
-            <Reveal key={lot.id} delay={i * 100}>
+          {lotissements.map((lot, i) => (
+            <Reveal key={lot.id || lot.slug} delay={i * 100}>
               <Link href={`/lotissements/${lot.slug}`} className="glass-card rounded-2xl overflow-hidden group block">
                 <div className="relative h-64 overflow-hidden">
                   <img src={lot.image} alt={lot.title} className="w-full h-full object-cover luxury-image" loading="lazy" />

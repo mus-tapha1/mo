@@ -1,19 +1,17 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useMemo } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import PropertyCard from '@/components/PropertyCard';
 import VideoPlayer from '@/components/VideoPlayer';
 import Reveal from '@/components/Reveal';
 import { config } from '@/config/site';
-import { properties as propertiesDefault, getFeaturedProperties, propertyTypes, budgetRanges } from '@/data/properties';
-import { lotissements as lotissementsDefault } from '@/data/lotissements';
-import { manatiq as manatiqDefault } from '@/data/manatiq';
-import { videos as videosDefault } from '@/data/videos';
+import { propertyTypes, budgetRanges } from '@/data/properties';
+import { useLiveData } from '@/lib/use-live-data';
+import { getFallbackProperties, getFallbackLotissements, getFallbackManatiq, getFallbackVideos } from '@/lib/live-data';
 
 export default function HomePage() {
   const router = useRouter();
@@ -21,17 +19,24 @@ export default function HomePage() {
   const [searchBudget, setSearchBudget] = useState('');
   const [searchArea, setSearchArea] = useState('');
 
-  const featured = useMemo(() => propertiesDefault.filter((p) => p.featured), []);
-  const topVideos = useMemo(() => videosDefault.slice(0, 3), []);
-  const topLotissements = useMemo(() => lotissementsDefault.slice(0, 3), []);
+  // جلب البيانات الحيّة من GitHub (data.json) — تظهر التغييرات فوراً بدون بناء
+  const { data: liveData } = useLiveData();
+  const properties = liveData.properties || getFallbackProperties();
+  const lotissements = liveData.lotissements || getFallbackLotissements();
+  const manatiq = liveData.manatiq || getFallbackManatiq();
+  const videos = liveData.videos || getFallbackVideos();
+
+  const featured = useMemo(() => properties.filter((p) => p.featured), [properties]);
+  const topVideos = useMemo(() => videos.slice(0, 3), [videos]);
+  const topLotissements = useMemo(() => lotissements.slice(0, 3), [lotissements]);
 
   // إحصائيات ديناميكية من البيانات
   const stats = useMemo(() => [
-    { value: propertiesDefault.length, label: 'عقار متوفّر' },
-    { value: lotissementsDefault.length, label: 'تجزئة فاخرة' },
-    { value: manatiqDefault.length, label: 'منطقة مغطّاة' },
-    { value: videosDefault.length, label: 'فيديو ميدياتي' },
-  ], []);
+    { value: properties.length, label: 'عقار متوفّر' },
+    { value: lotissements.length, label: 'تجزئة فاخرة' },
+    { value: manatiq.length, label: 'منطقة مغطّاة' },
+    { value: videos.length, label: 'فيديو متيدياتي' },
+  ], [properties.length, lotissements.length, manatiq.length, videos.length]);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -85,8 +90,8 @@ export default function HomePage() {
 
           <Reveal delay={400}>
             <p className="text-creme/70 text-base sm:text-lg max-w-2xl mx-auto mb-10 leading-relaxed">
-              منصة عقارية فاخرة في {config.city}. نقرأ العقار قبل أن نقترحه —
-              ننظّم المعطيات، نوضّح السعر والموقع والمساحة، ونطرح نقاط الانتباه لقرار أكثر وعياً.
+              منصة عقارية فاخرة في {config.city}. نقرأ العقار قبل أن نقتره —
+              ننظّم المعطيات، نوّضح السعر والموقع والمساحة، ونطرح نقاط الانتباه لقرار أكثر وعياً.
             </p>
           </Reveal>
 
@@ -198,7 +203,7 @@ export default function HomePage() {
                   <li className="flex gap-2"><span className="text-or">✦</span> نبدأ من فهم العقار قبل الحكم عليه</li>
                   <li className="flex gap-2"><span className="text-or">✦</span> ننظّم السعر، المساحة، الموقع، التوجيه، والوثائق</li>
                   <li className="flex gap-2"><span className="text-or">✦</span> نقارن العرض بسياقه المحلي كلما توفرت المعطيات</li>
-                  <li className="flex gap-2"><span className="text-or">✦</span> نوضّح نقاط القوة ونقاط الانتباه بلغة بسيطة</li>
+                  <li className="flex gap-2"><span className="text-or">✦</span> نوّضح نقاط القوة ونقاط الانتباه بلغة بسيطة</li>
                   <li className="flex gap-2"><span className="text-or">✦</span> نساعدك على طرح الأسئلة الصحيحة قبل القرار</li>
                 </ul>
               </div>
@@ -210,8 +215,8 @@ export default function HomePage() {
             {[
               { n: '01', t: 'نستقبل طلبك', d: 'تحدد نوع العقار والميزانية والمنطقة' },
               { n: '02', t: 'نقرأ المعطيات', d: 'نقارن السعر والطلب والخدمات القريبة' },
-              { n: '03', t: 'نقدّم خلاصة', d: 'نخصّص ما هو واضح وما يستحق انتباهاً' },
-              { n: '04', t: 'نرافق الخطوة', d: 'نفسّر الخطوة التالية ببساطة' },
+              { n: '03', t: 'نقدّم خلاصة', d: 'نخصّص ما هو واضح وما تستحق انتباهاً' },
+              { n: '04', t: 'نرافق الخطوة', d: 'نفّسر الخطوة التالية ببساطة' },
             ].map((step, i) => (
               <Reveal key={step.n} delay={i * 100}>
                 <div className="text-center p-6">
@@ -273,17 +278,17 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ===== الميادين (الفيديوهات) ===== */}
+      {/* ===== الميديات (الفيديوهات) ===== */}
       <section className="py-24 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto">
           <Reveal>
             <div className="text-center mb-12">
               <span className="text-or/60 text-xs tracking-[0.4em] font-light">MÉDIAS</span>
               <h2 className="text-4xl sm:text-5xl font-bold mt-3 mb-4" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
-                <span className="text-gold">الميادين</span>
+                <span className="text-gold">الميديات</span>
               </h2>
               <p className="text-creme/60 text-sm max-w-xl mx-auto">
-                محتوى ميداني يساعدك تفهم السوق العقاري وتقرر بثقة
+                محتوى متياني يساعدك تفهم السوق العقاري وتقرر بثقة
               </p>
               <div className="gold-divider w-32 mx-auto mt-4" />
             </div>
@@ -304,7 +309,7 @@ export default function HomePage() {
           <Reveal>
             <div className="text-center mt-10">
               <Link href="/media" className="btn-outline-gold px-8 py-3 rounded-full text-sm inline-block">
-                شاهد كل الميادين
+                شاهد كل الميديات
               </Link>
             </div>
           </Reveal>
@@ -326,7 +331,7 @@ export default function HomePage() {
 
           <div className="grid md:grid-cols-3 gap-6">
             {topLotissements.map((lot, i) => (
-              <Reveal key={lot.id} delay={i * 100}>
+              <Reveal key={lot.id || lot.slug} delay={i * 100}>
                 <Link href={`/lotissements/${lot.slug}`} className="glass-card rounded-2xl overflow-hidden group block">
                   <div className="relative h-64 overflow-hidden">
                     <img src={lot.image} alt={lot.title} className="w-full h-full object-cover luxury-image" loading="lazy" />

@@ -165,8 +165,9 @@ export async function uploadImage(file, onProgress) {
     `chore: رفع صورة ${fileName}`
   );
 
-  const relativeUrl = `/${filePath}`;
-  return relativeUrl;
+  // نرجع raw GitHub URL ليعمل الصورة فوراً على الموقع المنشور بدون بناء
+  const rawUrl = `https://raw.githubusercontent.com/${owner}/${repo}/main/${filePath}`;
+  return rawUrl;
 }
 
 // ============================================================
@@ -212,6 +213,56 @@ export async function syncDataToRepo(data, onProgress) {
 // ============================================================
 //  قراءة البيانات المركزية من المستودع
 // ============================================================
+//  حذف صورة من المستودع (public/uploads/)
+//  يقبل مساراً نسبياً (/public/uploads/img.jpg) أو raw URL كاملاً
+// ============================================================
+export async function deleteImage(imageUrl) {
+  const { token, owner, repo } = getSyncSettings();
+  if (!token) throw new Error('لم يتم إعداد GitHub.');
+  if (!imageUrl) return;
+
+  // استخراج مسار الملف من الرابط أو المسار
+  let filePath;
+  if (imageUrl.includes('raw.githubusercontent.com')) {
+    // raw URL: .../main/public/uploads/img.jpg
+    const match = imageUrl.match(/\/main\/(.+)$/);
+    filePath = match ? match[1] : null;
+  } else if (imageUrl.startsWith('/public/uploads/') || imageUrl.startsWith('public/uploads/')) {
+    filePath = imageUrl.replace(/^\/?/, '');
+  } else if (imageUrl.startsWith('/uploads/') || imageUrl.startsWith('uploads/')) {
+    filePath = `public/${imageUrl.replace(/^\/?/, '')}`;
+  } else {
+    return; // ليست صورة مرفوعة محلياً
+  }
+
+  if (!filePath) return;
+
+  const sha = await getFileSha(token, owner, repo, filePath, 'main');
+  if (!sha) return; // الملف غير موجود — لا شيء لنحذفه
+
+  const url = `https://api.github.com/repos/${owner}/${repo}/contents/${filePath}`;
+  const res = await fetch(url, {
+    method: 'DELETE',
+    headers: {
+      Authorization: `token ${token}`,
+      Accept: 'application/vnd.github.v3+json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      message: `chore: حذف صورة ${filePath.split('/').pop()}`,
+      sha,
+      branch: 'main',
+    }),
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.message || `فشل حذف الصورة: ${res.status}`);
+  }
+  return res.json();
+}
+
+// ============================================================
 export async function fetchDataFromRepo() {
   const { owner, repo } = getSyncSettings();
   const rawUrl = `https://raw.githubusercontent.com/${owner}/${repo}/main/${DATA_FILE_PATH}`;
@@ -243,6 +294,7 @@ export default {
   detectRepoFromToken,
   uploadImage,
   uploadImages,
+  deleteImage,
   syncDataToRepo,
   fetchDataFromRepo,
   checkActionsStatus,

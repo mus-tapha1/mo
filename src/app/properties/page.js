@@ -6,7 +6,9 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import PropertyCard from '@/components/PropertyCard';
 import Reveal from '@/components/Reveal';
-import { properties as propertiesDefault, propertyTypes, budgetRanges } from '@/data/properties';
+import { propertyTypes, budgetRanges } from '@/data/properties';
+import { useLiveData } from '@/lib/use-live-data';
+import { getFallbackProperties } from '@/lib/live-data';
 
 function PropertiesContent() {
   const searchParams = useSearchParams();
@@ -14,6 +16,10 @@ function PropertiesContent() {
   const [budgetFilter, setBudgetFilter] = useState('');
   const [search, setSearch] = useState('');
   const [initialized, setInitialized] = useState(false);
+
+  // جلب البيانات الحيّة من GitHub — تظهر التغييرات فوراً بدون بناء
+  const { data: liveData } = useLiveData();
+  const properties = liveData.properties || getFallbackProperties();
 
   // قراءة معاملات URL عند التحميل (من نموذج البحث في الهيرو)
   useEffect(() => {
@@ -29,7 +35,7 @@ function PropertiesContent() {
   }, [searchParams, initialized]);
 
   const filtered = useMemo(() => {
-    return propertiesDefault.filter((p) => {
+    return properties.filter((p) => {
       if (typeFilter && p.typeKey !== typeFilter) return false;
       const range = budgetRanges.find((r) => r.key === budgetFilter);
       if (range && (p.price < range.min || p.price > range.max)) return false;
@@ -40,7 +46,7 @@ function PropertiesContent() {
       }
       return true;
     });
-  }, [typeFilter, budgetFilter, search]);
+  }, [properties, typeFilter, budgetFilter, search]);
 
   return (
     <>

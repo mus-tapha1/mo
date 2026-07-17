@@ -1,14 +1,39 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Reveal from '@/components/Reveal';
-import { lotissements as lotissementsDefault } from '@/data/lotissements';
+import { useLiveData } from '@/lib/use-live-data';
+import { getFallbackLotissements } from '@/lib/live-data';
 
 export default function LotissementDetailPage({ params }) {
   const { slug } = params;
-  const lot = lotissementsDefault.find((l) => l.slug === slug);
+  const [lot, setLot] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  // جلب البيانات الحيّة من GitHub — تظهر التغييرات فوراً بدون بناء
+  const { data: liveData } = useLiveData();
+  const lotissements = liveData.lotissements || getFallbackLotissements();
+
+  useEffect(() => {
+    const found = lotissements.find((l) => l.slug === slug);
+    setLot(found || null);
+    setLoading(false);
+  }, [slug, lotissements]);
+
+  if (loading) {
+    return (
+      <>
+        <Header />
+        <div className="min-h-screen flex items-center justify-center pt-20">
+          <p className="text-creme/50">جارٍ التحميل...</p>
+        </div>
+        <Footer />
+      </>
+    );
+  }
 
   if (!lot) {
     return (

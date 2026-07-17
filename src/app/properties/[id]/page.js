@@ -5,9 +5,9 @@ import Link from 'next/link';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Reveal from '@/components/Reveal';
-import { properties as propertiesDefault } from '@/data/properties';
-import { getPropertyById } from '@/lib/store';
 import { config, whatsappShareLink, facebookShareLink, twitterShareLink } from '@/config/site';
+import { useLiveData } from '@/lib/use-live-data';
+import { getFallbackProperties } from '@/lib/live-data';
 
 /* ===== أيقونات SVG ===== */
 const WhatsAppIcon = () => (
@@ -65,13 +65,16 @@ export default function PropertyDetailPage({ params }) {
   const [property, setProperty] = useState(null);
   const [mounted, setMounted] = useState(false);
 
-  // دمج البيانات الافتراضية مع localStorage
+  // جلب البيانات الحيّة من GitHub — تظهر التغييرات فوراً بدون بناء
+  const { data: liveData } = useLiveData();
+  const properties = liveData.properties || getFallbackProperties();
+
+  // دمج البيانات الحيّة مع fallback
   useEffect(() => {
-    const stored = getPropertyById(id);
-    const fromDefault = propertiesDefault.find((p) => p.id === id);
-    setProperty(stored || fromDefault || null);
+    const fromLive = properties.find((p) => p.id === id);
+    setProperty(fromLive || null);
     setMounted(true);
-  }, [id]);
+  }, [id, properties]);
 
   const detailUrl = typeof window !== 'undefined'
     ? `${window.location.origin}${process.env.NEXT_PUBLIC_BASE_PATH || ''}/properties/${id}`

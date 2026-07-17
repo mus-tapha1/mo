@@ -84,6 +84,7 @@ jspm_packages/
 .parcel-cache
 
 # Next.js build output
+/out
 .next
 
 # Nuxt.js build / generate output

@@ -4,9 +4,14 @@ import Link from 'next/link';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Reveal from '@/components/Reveal';
-import { manatiq as manatiqDefault } from '@/data/manatiq';
+import { useLiveData } from '@/lib/use-live-data';
+import { getFallbackManatiq } from '@/lib/live-data';
 
 export default function ManatiqPage() {
+  // جلب البيانات الحيّة من GitHub — تظهر التغييرات فوراً بدون بناء
+  const { data: liveData } = useLiveData();
+  const manatiq = liveData.manatiq || getFallbackManatiq();
+
   return (
     <>
       <Header />
@@ -33,11 +38,11 @@ export default function ManatiqPage() {
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between mb-8">
             <span className="text-creme/50 text-sm">
-              {manatiqDefault.length} مناطق مغطّاة
+              {manatiq.length} مناطق مغطّاة
             </span>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {manatiqDefault.map((m, i) => (
+            {manatiq.map((m, i) => (
               <Reveal key={m.slug} delay={i * 100}>
                 <Link href={`/manatiq/${m.slug}`} className="glass-card rounded-2xl overflow-hidden group block">
                   <div className="relative h-56 overflow-hidden">

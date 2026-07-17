@@ -1,16 +1,50 @@
 'use client';
 
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Reveal from '@/components/Reveal';
-import { getManatiqBySlug, getProperties } from '@/lib/store';
+import { useLiveData } from '@/lib/use-live-data';
+import { getFallbackManatiq, getFallbackProperties } from '@/lib/live-data';
 
 export default function ManatiqDetailPage({ params }) {
   const { slug } = params;
-  const manatiq = getManatiqBySlug(slug);
+  const [manatiqItem, setManatiqItem] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  if (!manatiq) {
+  // جلب البيانات الحيّة من GitHub — تظهر التغييرات فوراً بدون بناء
+  const { data: liveData } = useLiveData();
+  const manatiq = liveData.manatiq || getFallbackManatiq();
+  const properties = liveData.properties || getFallbackProperties();
+
+  useEffect(() => {
+    const found = manatiq.find((m) => m.slug === slug);
+    setManatiqItem(found || null);
+    setLoading(false);
+  }, [slug, manatiq]);
+
+  // Find properties in this area (by city match or title contains)
+  const relatedProperties = useMemo(() => {
+    if (!manatiqItem) return [];
+    return properties.filter(
+      (p) => p.city === manatiqItem.city || p.title.includes(manatiqItem.title)
+    );
+  }, [manatiqItem, properties]);
+
+  if (loading) {
+    return (
+      <>
+        <Header />
+        <main className="pt-24 min-h-screen bg-noir text-creme flex items-center justify-center">
+          <p className="text-creme/50">جارٍ التحميل...</p>
+        </main>
+        <Footer />
+      </>
+    );
+  }
+
+  if (!manatiqItem) {
     return (
       <>
         <Header />
@@ -28,11 +62,6 @@ export default function ManatiqDetailPage({ params }) {
     );
   }
 
-  // Find properties in this area (by city match or title contains)
-  const relatedProperties = getProperties().filter(
-    (p) => p.city === manatiq.city || p.title.includes(manatiq.title)
-  );
-
   return (
     <>
       <Header />
@@ -40,8 +69,8 @@ export default function ManatiqDetailPage({ params }) {
         {/* Hero */}
         <section className="relative h-[50vh] min-h-[400px] overflow-hidden">
           <img
-            src={manatiq.image}
-            alt={manatiq.title}
+            src={manatiqItem.image}
+            alt={manatiqItem.title}
             className="absolute inset-0 w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-noir via-noir/70 to-noir/30" />
@@ -51,8 +80,8 @@ export default function ManatiqDetailPage({ params }) {
                 <Link href="/manatiq" className="text-or/70 text-sm hover:text-or transition-colors mb-4 inline-block">
                   ← كل المناطق
                 </Link>
-                <p className="text-or text-sm tracking-[0.2em] mb-2">{manatiq.city}</p>
-                <h1 className="text-4xl md:text-6xl font-bold text-gold mb-4">{manatiq.title}</h1>
+                <p className="text-or text-sm tracking-[0.2em] mb-2">{manatiqItem.city}</p>
+                <h1 className="text-4xl md:text-6xl font-bold text-gold mb-4">{manatiqItem.title}</h1>
                 <div className="gold-divider" />
               </Reveal>
             </div>
@@ -68,11 +97,11 @@ export default function ManatiqDetailPage({ params }) {
                 نظرة عامة
               </h2>
               <p className="text-creme/70 leading-loose text-lg text-justify mb-8">
-                {manatiq.description}
+                {manatiqItem.description}
               </p>
 
               <div className="glass-card p-8 mt-8">
-                <h3 className="text-or font-bold text-lg mb-4">لماذا الاستثمار في {manatiq.title}؟</h3>
+                <h3 className="text-or font-bold text-lg mb-4">لماذا الاستثمار في {manatiqItem.title}؟</h3>
                 <ul className="space-y-3 text-creme/70">
                   {[
                     'موقع استراتيجي يربط بين مناطق الحياة العصرية والخدمات الأساسية',
@@ -99,7 +128,7 @@ export default function ManatiqDetailPage({ params }) {
               <Reveal>
                 <div className="text-center mb-12">
                   <p className="text-or text-sm tracking-[0.2em] mb-2">عقارات في هذه المنطقة</p>
-                  <h2 className="text-3xl font-bold text-gold">عقارات متاحة في {manatiq.title}</h2>
+                  <h2 className="text-3xl font-bold text-gold">عقارات متاحة في {manatiqItem.title}</h2>
                   <div className="gold-divider mx-auto mt-4" />
                 </div>
               </Reveal>
@@ -139,7 +168,7 @@ export default function ManatiqDetailPage({ params }) {
         <section className="py-20 px-4">
           <div className="max-w-4xl mx-auto text-center">
             <Reveal>
-              <h2 className="text-3xl font-bold text-gold mb-4">هل تبحث عن عقار في {manatiq.title}؟</h2>
+              <h2 className="text-3xl font-bold text-gold mb-4">هل تبحث عن عقار في {manatiqItem.title}؟</h2>
               <p className="text-creme/60 mb-8">تواصل معنا وسنرشدك إلى أفضل الفرص في هذه المنطقة</p>
               <div className="flex flex-wrap gap-4 justify-center">
                 <Link href="/properties" className="btn-gold px-8 py-3">

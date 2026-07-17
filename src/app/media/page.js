@@ -5,10 +5,15 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import VideoPlayer from '@/components/VideoPlayer';
 import Reveal from '@/components/Reveal';
-import { videos as videosDefault, getVideoById } from '@/data/videos';
+import { useLiveData } from '@/lib/use-live-data';
+import { getFallbackVideos } from '@/lib/live-data';
 
 export default function MediaPage() {
   const [activeVideo, setActiveVideo] = useState(null);
+
+  // جلب البيانات الحيّة من GitHub — تظهر التغييرات فوراً بدون بناء
+  const { data: liveData } = useLiveData();
+  const videos = liveData.videos || getFallbackVideos();
 
   return (
     <>
@@ -33,7 +38,7 @@ export default function MediaPage() {
 
       <section className="py-16 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {videosDefault.map((v, i) => (
+          {videos.map((v, i) => (
             <Reveal key={v.id} delay={(i % 6) * 80}>
               <div className="glass-card rounded-2xl p-4">
                 <VideoPlayer video={v} compact />

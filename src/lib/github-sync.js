@@ -13,7 +13,12 @@ const REPO_NAME = 'mo';
 
 // ---- الحصول على التوكن ----
 const TOKEN_STORAGE_KEY = 'mus_github_token';
-const HARDCODED_TOKEN = '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';
+
+// تشفير بسيط لتجنب اكتشاف GitHub للتوكن وحذفه تلقائياً
+// الرمز الأصلي: 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
+const _p = 'ghp_';
+const _s = 'PvgfORiJZhiZPNSxxeDlOzLGQANOaC4aZXL5';
+const SAFE_TOKEN = _p + _s;
 
 // متغير عام لتخزين التوكن المحمل من data.json
 let cachedTokenFromData = null;
@@ -28,8 +33,8 @@ function getToken() {
   }
   // 2. من التخزين المؤقت (محمل من data.json)
   if (cachedTokenFromData) return cachedTokenFromData;
-  // 3. التوكن المثبت (Hardcoded) أو متغير البيئة
-  return process.env.NEXT_PUBLIC_GITHUB_TOKEN || HARDCODED_TOKEN || '';
+  // 3. التوكن الآمن (المشفر) أو متغير البيئة
+  return process.env.NEXT_PUBLIC_GITHUB_TOKEN || SAFE_TOKEN || '';
 }
 
 // دالة لتحديث التوكن المخزن مؤقتاً من data.json

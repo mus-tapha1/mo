@@ -265,7 +265,7 @@ export function getAllData() {
     manatiq: getManatiq(),
     videos: getVideos(),
     config: getConfig(),
-    adminPassword: getAdminPassword(),
+    // adminPassword مُستبعَد من المزامنة لأسباب أمنية (يبقى في localStorage فقط)
   };
 }
 

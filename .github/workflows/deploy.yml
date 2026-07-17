@@ -38,7 +38,7 @@ jobs:
           static_site_generator: next
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --no-frozen-lockfile
 
       - name: Build
         run: pnpm run build

@@ -63,7 +63,7 @@
       "city": "القنيطرة",
       "area": "موقع استراتيجي",
       "surface": 75,
-      "image": "/mo/public/uploads/img-mroe3vq6-j1kz.jpg",
+      "image": "https://raw.githubusercontent.com/mus-tapha1/mo/main/public/uploads/img-mrp9zzl7-du8d.jpg",
       "gallery": [
         "https://images.unsplash.com/photo-1600596357905-23c75a4a8d92?w=1200&q=80"
       ],
@@ -596,5 +596,5 @@
     "lang": "ar",
     "dir": "rtl"
   },
-  "updatedAt": "2026-07-17T18:14:38.424Z"
+  "updatedAt": "2026-07-17T18:33:12.191Z"
 }

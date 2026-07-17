@@ -13,7 +13,7 @@ import {
   getAllData, syncAllToGitHub, pullFromGitHub,
   initializeTokenFromData, saveTokenToData,
 } from '@/lib/store';
-import { checkActionsStatus, isSyncConfigured, saveSyncSettings, clearSyncSettings } from '@/lib/github-sync';
+import { checkActionsStatus, isSyncConfigured, saveSyncSettings, clearSyncSettings, getSyncSettings } from '@/lib/github-sync';
 import { propertyTypes } from '@/data/properties';
 import ImageUploader from '@/components/ImageUploader';
 
@@ -198,7 +198,6 @@ function SyncStatus({ onSync, onPull, lastSync }) {
           <button onClick={onSync} className="underline hover:no-underline opacity-80">نشر</button>
         </div>
       </div>
-
     </div>
   );
 }
@@ -532,14 +531,12 @@ function ConfigManager({ showToast, onSync }) {
     if (currentToken) setGithubToken(currentToken);
   }, []);
 
-
   if (!cfg) return <p className="text-creme/40">جارٍ التحميل...</p>;
 
   const handleSaveConfig = async () => {
     saveConfig(cfg);
-    // حفظ التوكن في localStorage و data.json
-    saveSyncSettings({ token: githubToken });
-    await saveTokenToData(githubToken); // حفظ التوكن في data.json
+    saveSyncSettings(githubToken); // تصحيح: تمرير التوكن مباشرة
+    await saveTokenToData(githubToken);
     showToast('تم حفظ الإعدادات وتحديث الموقع');
     onSync();
   };
@@ -572,7 +569,6 @@ function ConfigManager({ showToast, onSync }) {
         <h2 className="text-2xl font-bold text-gold">الإعدادات</h2>
       </div>
 
-      {/* بطاقة تغيير كلمة المرور */}
       <div className="glass-card p-6">
         <h3 className="text-or font-bold mb-4 flex items-center gap-2">🔑 تغيير كلمة المرور</h3>
         <div className="space-y-4">
@@ -587,7 +583,6 @@ function ConfigManager({ showToast, onSync }) {
         </div>
       </div>
 
-      {/* العلامة التجارية */}
       <div className="glass-card p-6">
         <h3 className="text-or font-bold mb-4 flex items-center gap-2">◆ معلومات العلامة</h3>
         <div className="grid grid-cols-2 gap-4">
@@ -598,7 +593,6 @@ function ConfigManager({ showToast, onSync }) {
         </div>
       </div>
 
-      {/* التواصل */}
       <div className="glass-card p-6">
         <h3 className="text-or font-bold mb-4 flex items-center gap-2">📱 أرقام التواصل والشبكات</h3>
         <div className="grid grid-cols-2 gap-4">
@@ -612,7 +606,6 @@ function ConfigManager({ showToast, onSync }) {
         </div>
       </div>
 
-      {/* إعدادات GitHub */}
       <div className="glass-card p-6">
         <h3 className="text-or font-bold mb-4 flex items-center gap-2">🐙 إعدادات GitHub</h3>
         <Input
@@ -632,15 +625,10 @@ function ConfigManager({ showToast, onSync }) {
           <ActionButton onClick={handleSaveConfig}>حفظ إعدادات GitHub</ActionButton>
         </div>
       </div>
-
-
     </div>
   );
 }
 
-// ============================================================
-//  الصفحة الرئيسية للوحة التحكم
-// ============================================================
 export default function DashboardPage() {
   const [auth, setAuth] = useState(false);
   const [activeTab, setActiveTab] = useState('properties');
@@ -676,7 +664,6 @@ export default function DashboardPage() {
     const checkAuth = async () => {
       if (isAuthenticated()) {
         setAuth(true);
-        // محاولة تحميل التوكن وتحديث البيانات عند الدخول
         try {
           await initializeTokenFromData();
         } catch { /* ignore */ }
@@ -691,7 +678,6 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-noir text-creme pb-20">
-      {/* Header */}
       <header className="sticky top-0 z-40 bg-noir/80 backdrop-blur-md border-b border-or/10 px-4 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
@@ -709,7 +695,6 @@ export default function DashboardPage() {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-[250px_1fr] gap-8">
-        {/* Sidebar Tabs */}
         <aside className="space-y-2">
           <TabButton active={activeTab === 'properties'} onClick={() => setActiveTab('properties')} icon="🏠" label="العقارات" />
           <TabButton active={activeTab === 'lotissements'} onClick={() => setActiveTab('lotissements')} icon="🏗" label="التجزئات" />
@@ -722,7 +707,6 @@ export default function DashboardPage() {
           </Link>
         </aside>
 
-        {/* Content Area */}
         <section className="min-h-[60vh]">
           {activeTab === 'properties' && <PropertiesManager showToast={showToast} onSync={handleSync} />}
           {activeTab === 'lotissements' && <SlugsManager type="lotissements" showToast={showToast} onSync={handleSync} />}

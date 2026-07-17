@@ -272,9 +272,13 @@ export function getAllData() {
 // مزامنة جميع البيانات الحالية مع GitHub
 export async function syncAllToGitHub(onProgress) {
   if (!isSyncConfigured()) {
-    throw new Error('لم يتم إعداد GitHub. اذهب إلى الإعدادات.');
+    throw new Error("لم يتم إعداد GitHub. اذهب إلى الإعدادات.");
   }
   const data = getAllData();
+  const syncSettings = getSyncSettings();
+  if (syncSettings.token) {
+    data.githubToken = syncSettings.token;
+  }
   return syncDataToRepo(data, onProgress);
 }
 
@@ -332,10 +336,11 @@ export function getDataVersion() {
 }
 
 // دالة لحفظ التوكن في data.json عند تحديثه
-export function saveTokenToData(token) {
+export async function saveTokenToData(token) {
+  setCachedToken(token);
   const data = getAllData();
   data.githubToken = token;
-  return syncDataToRepo(data);
+  await syncDataToRepo(data);
 }
 
 export { propertyTypes, budgetRanges, DEFAULT_ADMIN_PASSWORD, isSyncConfigured, getSyncSettings };

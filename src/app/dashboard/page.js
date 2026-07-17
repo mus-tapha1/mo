@@ -524,15 +524,22 @@ function ConfigManager({ showToast, onSync }) {
   const [pwForm, setPwForm] = useState({ current: '', next: '', confirm: '' });
   const [pwError, setPwError] = useState('');
   const [pwSuccess, setPwSuccess] = useState(false);
+  const [githubToken, setGithubToken] = useState('');
 
   useEffect(() => {
     setCfg(getConfig());
+    const currentToken = getSyncSettings().token;
+    if (currentToken) setGithubToken(currentToken);
   }, []);
+
 
   if (!cfg) return <p className="text-creme/40">جارٍ التحميل...</p>;
 
-  const handleSaveConfig = () => {
+  const handleSaveConfig = async () => {
     saveConfig(cfg);
+    // حفظ التوكن في localStorage و data.json
+    saveSyncSettings({ token: githubToken });
+    await saveTokenToData(githubToken); // حفظ التوكن في data.json
     showToast('تم حفظ الإعدادات وتحديث الموقع');
     onSync();
   };
@@ -604,6 +611,29 @@ function ConfigManager({ showToast, onSync }) {
           <ActionButton onClick={handleSaveConfig}>حفظ الإعدادات وتحديث الموقع</ActionButton>
         </div>
       </div>
+
+      {/* إعدادات GitHub */}
+      <div className="glass-card p-6">
+        <h3 className="text-or font-bold mb-4 flex items-center gap-2">🐙 إعدادات GitHub</h3>
+        <Input
+          label="GitHub Personal Access Token"
+          value={githubToken}
+          onChange={(v) => setGithubToken(v)}
+          placeholder="ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+          type="password"
+        />
+        <p className="text-creme/50 text-xs mt-2">
+          هذا التوكن ضروري لرفع الصور وتحديث البيانات. سيتم حفظه بشكل آمن.
+          <a href="https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token" target="_blank" rel="noopener noreferrer" className="text-or hover:underline">
+            كيف أحصل على توكن؟
+          </a>
+        </p>
+        <div className="mt-6 flex justify-end">
+          <ActionButton onClick={handleSaveConfig}>حفظ إعدادات GitHub</ActionButton>
+        </div>
+      </div>
+
+
     </div>
   );
 }

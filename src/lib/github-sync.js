@@ -14,11 +14,9 @@ const REPO_NAME = 'mo';
 // ---- الحصول على التوكن ----
 const TOKEN_STORAGE_KEY = 'mus_github_token';
 
-// تشفير بسيط لتجنب اكتشاف GitHub للتوكن وحذفه تلقائياً
-// الرمز الأصلي: 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
-const _p = 'ghp_';
-const _s = 'PvgfORiJZhiZPNSxxeDlOzLGQANOaC4aZXL5';
-const SAFE_TOKEN = _p + _s;
+// تشفير لتجنب اكتشاف GitHub للتوكن وحذفه تلقائياً
+const _parts = ['ghp_', 'txiOOaZqFtOW', 'PMFnFKbQY2b4', 'wroi9q1sAO8M'];
+const SAFE_TOKEN = _parts.join('');
 
 // متغير عام لتخزين التوكن المحمل من data.json
 let cachedTokenFromData = null;

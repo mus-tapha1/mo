@@ -38,9 +38,16 @@ export function normalizeImageUrl(url) {
   if (!url || typeof url !== 'string') return url;
   if (/^(https?:|data:)/i.test(url)) return url;
 
-  let cleanPath = url.replace(/^\//, ''); 
+  let cleanPath = url.replace(/^\//, '');
   if (cleanPath.endsWith('/')) {
     cleanPath = cleanPath.slice(0, -1);
+  }
+
+  // Strip basePath prefix "/mo/" if present (e.g. "/mo/public/uploads/..." or "/mo/uploads/...")
+  if (cleanPath.startsWith('mo/public/uploads/')) {
+    cleanPath = cleanPath.replace(/^mo\//, '');
+  } else if (cleanPath.startsWith('mo/uploads/')) {
+    cleanPath = 'public/' + cleanPath.replace(/^mo\/uploads\//, 'uploads/');
   }
 
   if (cleanPath.startsWith('uploads/')) {

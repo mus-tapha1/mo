@@ -251,10 +251,12 @@ export default function DashboardPage() {
     await syncData(updatedData);
     loadData();
   }
-  function deleteItem(type, index) {
+  async function deleteItem(type, index) {
     if (!confirm('حذف هذا العنصر؟')) return;
     const list = [...data[type]]; list.splice(index, 1);
-    setData(d => ({ ...d, [type]: list }));
+    const updatedData = { ...data, [type]: list };
+    setData(updatedData);
+    await syncData(updatedData);
   }
   function setField(key, val) {
     setModal(m => ({ ...m, item: { ...m.item, [key]: val } }));

@@ -63,7 +63,7 @@
       "city": "القنيطرة",
       "area": "موقع استراتيجي",
       "surface": 75,
-      "image": "/mo/public/uploads/img-mroe3vq6-j1kz.jpg",
+      "image": "https://raw.githubusercontent.com/mus-tapha1/mo/main/public/uploads/img-mroe3vq6-j1kz.jpg",
       "gallery": [
         "https://images.unsplash.com/photo-1600596357905-23c75a4a8d92?w=1200&q=80"
       ],
@@ -500,7 +500,7 @@
       "slug": "mimouza-kenitra",
       "title": "حي الميموزة",
       "city": "القنيطرة",
-      "image": "/mo/public/uploads/img-1784311898330-IMG_20260715_WA0012.jpg",
+      "image": "https://raw.githubusercontent.com/mus-tapha1/mo/main/public/uploads/img-1784311898330-IMG_20260715_WA0012.jpg",
       "description": "حي سكني راقٍ معروف بهدوئه وقربه من المرافق التعليمية والتجارية."
     },
     {

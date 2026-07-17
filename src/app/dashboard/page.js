@@ -426,6 +426,42 @@ export default function DashboardPage() {
                   <label style={S.inputLabel}>عنوان المكتب</label>
                   <input value={data.config?.contact?.address||''} onChange={e=>setData(d=>({...d,config:{...d.config,contact:{...d.config?.contact,address:e.target.value}}}))} style={S.input} placeholder="القنيطرة، المغرب" />
                 </div>
+                <div>
+                  <label style={S.inputLabel}>رقم واتساب (بصيغة دولية)</label>
+                  <input value={data.config?.contact?.whatsapp||''} onChange={e=>setData(d=>({...d,config:{...d.config,contact:{...d.config?.contact,whatsapp:e.target.value}}}))} style={S.input} placeholder="+212600000000" />
+                  <p style={{color:'#666',fontSize:11,marginTop:4}}>يُستخدم لزر واتساب العائم وأزرار التواصل — اكتبه بالصيغة الدولية بدون مسافات</p>
+                </div>
+                <div>
+                  <label style={S.inputLabel}>رقم الهاتف (للرابط الدولي)</label>
+                  <input value={data.config?.contact?.phoneHref||''} onChange={e=>setData(d=>({...d,config:{...d.config,contact:{...d.config?.contact,phoneHref:e.target.value}}}))} style={S.input} placeholder="+212600000000" />
+                  <p style={{color:'#666',fontSize:11,marginTop:4}}>يُستخدم في روابط tel: — نفس صيغة واتساب عادةً</p>
+                </div>
+              </div>
+            </div>
+
+            <div style={S.card}>
+              <h3 style={S.cardTitle}>📱 وسائل التواصل الاجتماعي</h3>
+              <div style={{display:'flex',flexDirection:'column',gap:12}}>
+                {[
+                  {label:'فيسبوك',    icon:'📘', key:'facebook',  ph:'https://www.facebook.com/yourpage'},
+                  {label:'إنستغرام',  icon:'📷', key:'instagram', ph:'https://www.instagram.com/yourpage'},
+                  {label:'يوتيوب',    icon:'▶️', key:'youtube',   ph:'https://www.youtube.com/@yourchannel'},
+                  {label:'تيك توك',   icon:'🎵', key:'tiktok',    ph:'https://www.tiktok.com/@yourpage'},
+                  {label:'إكس (تويتر)',icon:'🐦',key:'twitter',   ph:'https://x.com/yourhandle'},
+                  {label:'پينتيريست', icon:'📌', key:'pinterest', ph:'https://pinterest.com/yourpage'},
+                  {label:'لينك تري',  icon:'🌳', key:'linktree',  ph:'https://linktr.ee/yourpage'},
+                ].map(({label,icon,key,ph})=>(
+                  <div key={key}>
+                    <label style={S.inputLabel}>{icon} {label}</label>
+                    <input
+                      value={data.config?.social?.[key]||''}
+                      onChange={e=>setData(d=>({...d,config:{...d.config,social:{...d.config?.social,[key]:e.target.value}}}))}
+                      style={S.input}
+                      placeholder={ph}
+                      dir="ltr"
+                    />
+                  </div>
+                ))}
               </div>
             </div>
 

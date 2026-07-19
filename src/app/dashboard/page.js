@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { markDataSaved } from '@/lib/live-data';
 
 // ─────────────────────────────────────────────
 //  ثوابت ومساعدات
@@ -233,6 +234,7 @@ export default function DashboardPage() {
         }),
       });
       if (pushRes.ok) {
+        markDataSaved(); // ← يُبطل كاش الصفحات فوراً
         showStatus('ok', '✓ تم الحفظ والنشر — سيظهر على الموقع خلال دقيقة');
         return true;
       }

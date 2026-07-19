@@ -90,7 +90,7 @@ export default function HomePage() {
 
           <Reveal delay={400}>
             <p className="text-creme/70 text-base sm:text-lg max-w-2xl mx-auto mb-10 leading-relaxed">
-              منصة عقارية فاخرة في {config.city}. نقرأ العقار قبل أن نقتره —
+              منصة عقارية فاخرة في {config.city}. نقرأ العقار قبل أن تقتره —
               ننظّم المعطيات، نوّضح السعر والموقع والمساحة، ونطرح نقاط الانتباه لقرار أكثر وعياً.
             </p>
           </Reveal>

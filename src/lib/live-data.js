@@ -24,6 +24,8 @@ const RAW_URL = `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/ma
 
 const CACHE_KEY = 'mus_live_data';
 const CACHE_TIMESTAMP_KEY = 'mus_live_data_ts';
+// مفتاح يُكتب عند كل حفظ من لوحة التحكم لإبطال الكاش فوراً
+const SAVE_VERSION_KEY = 'mus_data_saved';
 // مدة صلاحية الذاكرة المؤقتة: تم تقليلها لـ 30 ثانية لضمان الظهور الفوري
 const CACHE_TTL = 30 * 1000;
 
@@ -117,10 +119,21 @@ function readCache() {
     const raw = localStorage.getItem(CACHE_KEY);
     if (!raw || !ts) return null;
     if (Date.now() - parseInt(ts) > CACHE_TTL) return null;
+    // إذا حدث حفظ من لوحة التحكم بعد كتابة الكاش → ابطل الكاش فوراً
+    const savedAt = localStorage.getItem(SAVE_VERSION_KEY);
+    if (savedAt && parseInt(savedAt) > parseInt(ts)) return null;
     return normalizeAllImages(JSON.parse(raw));
   } catch {
     return null;
   }
+}
+
+// تُستدعى من لوحة التحكم بعد كل حفظ ناجح لإبطال كاش الصفحات
+export function markDataSaved() {
+  if (!isClient) return;
+  try {
+    localStorage.setItem(SAVE_VERSION_KEY, Date.now().toString());
+  } catch { /* ignore */ }
 }
 
 function writeCache(data) {
